@@ -1,52 +1,78 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "erc721a/contracts/ERC721A.sol";
 
-contract NFT is ERC721URIStorage {
-    uint public tokenCount;
+contract NFT is ERC721A, Ownable {
+    string public uriPrefix = '';
+    string public uriSuffix = '.json';
 
-    mapping(uint => address[]) public buyers;
-    mapping(uint => string) private hiddentokenURIs;
+    uint256 public max_supply = 9999;
 
-    constructor() ERC721("Artist Marketplace NFT", "AMN") {}
+    bool public whitelistEnabled = true;
+    address[] public whitelistedAddresses;
 
-    function mint(string memory _tokenURI, string memory _hiddenTokenURI) external returns(uint) {
-        tokenCount += 1;
-        _safeMint(msg.sender, tokenCount);
-        _setTokenURI(tokenCount, _tokenURI);
+    bool private revealed = false;
+    string private revealUrl = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
 
-        addHiddenTokenUri(tokenCount, _hiddenTokenURI);
+    constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
+    {
+        // Set whitelist
+        delete whitelistedAddresses;
+        whitelistedAddresses = _usersToWhitelist;
 
-        return(tokenCount);
+        // Mint 333 NFTs for the team
+        _mint(teamAddress, 333);
     }
 
-    function addHiddenTokenUri(uint256 _tokenId, string memory _hiddenTokenURI) private {
-        hiddentokenURIs[_tokenId] = _hiddenTokenURI;
-    }
+    function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
+        require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token');
 
-    function addBuyer(address _user, uint256 _tokenId) public {
-        buyers[_tokenId].push(_user);
-    }
-
-    function getTokenUriForUser(address _user, uint256 _tokenId) public view returns(string memory) {
-        if (userHasBoughtToken(_user, _tokenId)) {
-            return hiddentokenURIs[_tokenId];
+        if (revealed == false) {
+            return revealUrl;
         }
-        return "User has no access for this token";
+
+        string memory currentBaseURI = _baseURI();
+        return bytes(currentBaseURI).length > 0
+            ? string(abi.encodePacked(currentBaseURI, Strings.toString(_tokenId), uriSuffix))
+            : '';
     }
 
-    function getBuyersCount(uint256 _tokenId) public view returns(uint) {
-        return buyers[_tokenId].length;
+    function mint(uint256 quantity) external payable {
+        _mint(msg.sender, quantity);
     }
 
-    function getBuyers(uint256 _tokenId) public view returns(address[] memory) {
-        return buyers[_tokenId];
+    function _baseURI() internal pure override returns (string memory) {
+        return "ipfs://QmNmBHVHMHt8kvT2VtPDjZ6sjGjyjJ5LBsr1DhnLvzTZss/";
+    }
+    
+    function baseTokenURI() public pure returns (string memory) {
+        return _baseURI();
     }
 
-    function userHasBoughtToken(address _user, uint256 _tokenId) public view returns(bool) {
-        for (uint i = 0; i < buyers[_tokenId].length; i++) {
-            if (buyers[_tokenId][i] == _user) {
+    function revealCollection() public {
+        revealed = true;
+    }
+
+    function contractURI() public pure returns (string memory) {
+        return "ipfs://QmTA41cxgi62ik86g3e1m8sbgvPus7SLZwoNjFrCDUGvxq/";
+    }
+
+    function setWhitelistEnabled(bool _state) public onlyOwner {
+        whitelistEnabled = _state;
+    }
+
+    function whitelistUsers(address[] calldata _users) public onlyOwner {
+        delete whitelistedAddresses;
+        whitelistedAddresses = _users;
+    }
+
+    function isWhitelisted(address _user) public view returns (bool) {
+        for (uint i = 0; i < whitelistedAddresses.length; i++) {
+            if (whitelistedAddresses[i] == _user) {
                 return true;
             }
         }
