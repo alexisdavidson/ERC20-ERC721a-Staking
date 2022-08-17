@@ -16,7 +16,10 @@ contract NFT is ERC721A, Ownable {
     address[] public whitelistedAddresses;
 
     bool private revealed = false;
-    string private revealUrl = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
+    string private revealUri = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
+
+    string private unkownUri = ""; // todo: Metadata with unkown image
+    string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
     {
@@ -26,13 +29,22 @@ contract NFT is ERC721A, Ownable {
 
         // Mint 333 NFTs for the team
         _mint(teamAddress, 333);
+
+        // Set unkownUris
+        for (uint i = 0; i < unknownUris.length; i++) {
+            unknownUris[i] = unkownUri;
+        }
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token');
 
         if (revealed == false) {
-            return revealUrl;
+            return revealUri;
+        }
+
+        if (_tokenId < 20) { // 20 first tokens are Unkowns
+            return unknownUris[_tokenId];
         }
 
         string memory currentBaseURI = _baseURI();
@@ -77,5 +89,12 @@ contract NFT is ERC721A, Ownable {
             }
         }
         return false;
+    }
+
+    function revealUnkown(uint256 _tokenId, string memory tokenUri) public onlyOwner {
+        require(_tokenId >= 0 && _tokenId < 20, "tokenId must be between 0 and 20");
+        require(keccak256(abi.encodePacked((unknownUris[_tokenId]))) == keccak256(abi.encodePacked((unkownUri))), "unkown has already been revealed");
+
+        unknownUris[_tokenId] = tokenUri;
     }
 }
