@@ -1,58 +1,77 @@
 import { useState, useEffect } from 'react'
 import { ethers } from "ethers"
-import { Row, Col, Card, Button } from 'react-bootstrap'
-import { useNavigate } from "react-router-dom";
+import { Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap'
+import configContract from './configContract';
 
-const Home = ({ marketplace, nft }) => {
-    let navigate = useNavigate(); 
-
+const Home = ({ account, nft, token, staker }) => {
     const [loading, setLoading] = useState(true)
+    const [mintQuantity, setMintQuantity] = useState(1)
+    const [stakeId, setStakeId] = useState(null)
+    const [unstakeId, setUnstakeId] = useState(null)
+    const [balance, setBalance] = useState("0")
+    const [nftBalance, setNftBalance] = useState("0")
     const [items, setItems] = useState([])
 
-    const routeChangeViewItem = (item) => { 
-        let path = "/view-item" 
-        console.log("Navigate to view-item " + item.itemId)
-        navigate(path, {
-            state: {
-                itemId: parseInt(item.itemId)
-            }
+    const loadOpenSeaItems = async () => {
+        let url = `${configContract.OPENSEA_API}/assets?owner=${account}&asset_contract_address=${nft.address}&format=json`
+        // console.log("Fetching openSea Items for url: " + url)
+
+        let items = await fetch(url)
+        .then((res) => res.json())
+        .then((res) => {
+          return res.assets
         })
-    }
+        .catch((e) => {
+          console.error(e)
+          console.error('Could not talk to OpenSea')
+          return null
+        })
 
-    const loadMarketplaceItems = async () => {
-        // Load all unsold items
-        const itemCount = await marketplace.itemCount()
-        let items = []
-        for (let i = 1; i <= itemCount; i++) {
-            const item = await marketplace.items(i)
-            // get uri url from nft contract
-            const uri = await nft.tokenURI(item.tokenId)
-            // use uri to fetch the nft metadata stored on ipfs 
-            const response = await fetch(uri)
-            const metadata = await response.json()
-            // get total price of item (item price + fee)
-            const totalPrice = await marketplace.getTotalPrice(item.itemId)
-            // Add item to items array
-            items.push({
-                totalPrice,
-                itemId: item.itemId,
-                seller: item.seller,
-                name: metadata.name,
-                description: metadata.description,
-                mediaType: metadata.mediaType
-            })
-        }
-        setLoading(false)
+        setBalance((await token.balanceOf(account)).toString())
+        setNftBalance((await nft.balanceOf(account)).toString())
         setItems(items)
+        setLoading(false)
     }
 
-    const buyMarketItem = async (item) => {
-        await (await marketplace.purchaseItem(item.itemId, { value: item.totalPrice })).wait()
-        loadMarketplaceItems()
+    const handleChangeMintQuantity = event => {
+        setMintQuantity(event.target.value);
+        console.log('setMintQuantity ', event.target.value);
+    };
+
+    const mint = async () => {
+        if (mintQuantity >= 1 && mintQuantity < 1000) {
+            console.log("Mint " + mintQuantity + " nfts...")
+            await(await nft.mint(mintQuantity)).wait()
+            window.location.reload();
+        }
+        else {
+            console.log("Incorrect quantity to mint " + mintQuantity)
+        }
+      }
+
+    const handleChangeStakeId = event => {
+        setStakeId(event.target.value);
+        console.log('setStakeId ', event.target.value);
+    };
+    const stake = async () => {
+        if (stakeId != null) {
+            console.log("Staking " + stakeId + " nft...")
+            await(await staker.stake(stakeId)).wait()
+        }
+    }
+    const handleChangeUnstakeId = event => {
+        setUnstakeId(event.target.value);
+        console.log('setUnstakeId ', event.target.value);
+    };
+    const unstake = async () => {
+        if (unstakeId != null) {
+            console.log("Unstaking " + unstakeId + " nft...")
+            await(await staker.unstake(unstakeId)).wait()
+        }
     }
 
     useEffect(() => {
-        loadMarketplaceItems()
+        loadOpenSeaItems()
     }, [])
 
     if (loading) return (
@@ -63,6 +82,43 @@ const Home = ({ marketplace, nft }) => {
 
     return (
         <div className="flex justify-center">
+            <div className="px-5 container">
+                <p>Token Balance: {balance != null ? balance : "null"}</p>
+                <p>NFT Balance: {nftBalance != null ? nftBalance : "null"}</p>
+            </div>
+
+            <div className="px-5 container">
+                <InputGroup className="mb-3">
+                    <InputGroup.Text>Mint Quantity</InputGroup.Text>
+                    <Form.Control aria-label="Amount" onChange={handleChangeMintQuantity}/>
+                </InputGroup>
+                
+                <Form className="pt-2 d-flex">
+                    <Button onClick={() => mint()} variant="primary" style={{height: "50%"}}>Mint</Button>
+                </Form>
+            </div>
+
+            <div className="px-5 container">
+                <InputGroup className="mb-3">
+                    <InputGroup.Text>Stake token Id</InputGroup.Text>
+                    <Form.Control aria-label="Amount" onChange={handleChangeStakeId}/>
+                </InputGroup>
+                
+                <Form className="pt-2 d-flex">
+                    <Button onClick={() => stake()} variant="primary" style={{height: "50%"}}>Stake</Button>
+                </Form>
+            </div>
+
+            <div className="px-5 container">
+                <InputGroup className="mb-3">
+                    <InputGroup.Text>Unstake token Id</InputGroup.Text>
+                    <Form.Control aria-label="Amount" onChange={handleChangeUnstakeId}/>
+                </InputGroup>
+                
+                <Form className="pt-2 d-flex">
+                    <Button onClick={() => unstake()} variant="primary" style={{height: "50%"}}>Unstake</Button>
+                </Form>
+            </div>
             {items.length > 0 ?
                 <div className="px-5 container">
                     <Row xs={1} md={2} lg={4} className="g-4 py-5">
@@ -71,18 +127,17 @@ const Home = ({ marketplace, nft }) => {
                                 <Card>
                                     {/* <Card.Img variant="top" src={item.image} /> */}
                                     <Card.Body color="secondary">
-                                    <Card.Title>{item.mediaType} {item.name}</Card.Title>
+                                    <Card.Title>{item.name}</Card.Title>
                                     <Card.Text>
                                         {item.description}
                                     </Card.Text>
                                     </Card.Body>
                                     <Card.Footer>
-                                    <div className='d-grid'>
-                                    {ethers.utils.formatEther(item.totalPrice)} Matic <br/>
-                                        <Button onClick={() => routeChangeViewItem(item)} variant="primary" size="lg">
-                                            View
-                                        </Button>
-                                    </div>
+                                        <div className='d-grid'>
+                                            <Button onClick={() => stake(item)} variant="primary" size="lg">
+                                                Stake
+                                            </Button>
+                                        </div>
                                     </Card.Footer>
                                 </Card>
                             </Col>
