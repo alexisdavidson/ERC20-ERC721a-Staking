@@ -98,43 +98,39 @@ const Home = ({ account, nft, token, staker }) => {
             </div>
 
             <div className="px-5 container">
-                <InputGroup className="mb-3">
-                    <InputGroup.Text>Mint Quantity</InputGroup.Text>
-                    <Form.Control aria-label="Amount" onChange={handleChangeMintQuantity}/>
-                </InputGroup>
-                
-                <Form className="pt-2 d-flex">
-                    <Button onClick={() => mint()} variant="primary" style={{height: "50%"}}>Mint</Button>
-                </Form>
-            </div>
+                <Col className="px-5">
+                    <Row className="pt-2">
+                        <InputGroup className="mb-3" style={{width: "50%", margin:"auto"}}>
+                            <Button onClick={() => mint()} variant="primary">Mint</Button>
+                            <Form.Control aria-label="Amount" onChange={handleChangeMintQuantity}/>
+                            <InputGroup.Text>Quantity</InputGroup.Text>
+                        </InputGroup>
+                    </Row>
+                    
+                    <Row className="pt-2">
+                        <InputGroup className="mb-3" style={{width: "50%", margin:"auto"}}>
+                            <Button onClick={() => stake()} variant="primary">Stake</Button>
+                            <Form.Control aria-label="Amount" onChange={handleChangeStakeId}/>
+                            <InputGroup.Text>Token Id</InputGroup.Text>
+                        </InputGroup>
+                    </Row>
 
-            <div className="px-5 container">
-                <InputGroup className="mb-3">
-                    <InputGroup.Text>Stake token Id</InputGroup.Text>
-                    <Form.Control aria-label="Amount" onChange={handleChangeStakeId}/>
-                </InputGroup>
-                
-                <Form className="pt-2 d-flex">
-                    <Button onClick={() => stake()} variant="primary" style={{height: "50%"}}>Stake</Button>
-                </Form>
-            </div>
+                    <Row className="pt-2">
+                        <InputGroup className="mb-3" style={{width: "50%", margin:"auto"}}>
+                            <Button onClick={() => unstake()} variant="primary">Unstake</Button>
+                            <Form.Control aria-label="Amount" onChange={handleChangeUnstakeId}/>
+                            <InputGroup.Text>Token Id</InputGroup.Text>
+                        </InputGroup>
+                    </Row>
 
-            <div className="px-5 container">
-                <InputGroup className="mb-3">
-                    <InputGroup.Text>Unstake token Id</InputGroup.Text>
-                    <Form.Control aria-label="Amount" onChange={handleChangeUnstakeId}/>
-                </InputGroup>
-                
-                <Form className="pt-2 d-flex">
-                    <Button onClick={() => unstake()} variant="primary" style={{height: "50%"}}>Unstake</Button>
-                </Form>
-            </div>
+                    <Row className="pt-2">
+                        <InputGroup className="mb-3" style={{width: "50%", margin:"auto"}}>
+                            <Form.Control aria-label="Amount" onChange={handleOwnerOf}/>
+                            <InputGroup.Text>Owner Of</InputGroup.Text>
+                        </InputGroup>
+                    </Row>
+                </Col>
 
-            <div className="px-5 container">
-                <InputGroup className="mb-3">
-                    <InputGroup.Text>Owner Of</InputGroup.Text>
-                    <Form.Control aria-label="Amount" onChange={handleOwnerOf}/>
-                </InputGroup>
             </div>
 
 
