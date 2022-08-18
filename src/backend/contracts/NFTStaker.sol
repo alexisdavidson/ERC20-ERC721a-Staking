@@ -5,7 +5,7 @@ import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract NFTStaker {
+contract NFTStaker is ERC721Holder {
     ERC721A public parentNFT;
     ERC20 public rewardsToken;
 

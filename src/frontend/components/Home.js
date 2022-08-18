@@ -10,6 +10,7 @@ const Home = ({ account, nft, token, staker }) => {
     const [unstakeId, setUnstakeId] = useState(null)
     const [balance, setBalance] = useState("0")
     const [nftBalance, setNftBalance] = useState("0")
+    const [isWhitelisted, setIsWhitelisted] = useState(false)
     const [items, setItems] = useState([])
 
     const loadOpenSeaItems = async () => {
@@ -29,6 +30,7 @@ const Home = ({ account, nft, token, staker }) => {
 
         setBalance((await token.balanceOf(account)).toString())
         setNftBalance((await nft.balanceOf(account)).toString())
+        setIsWhitelisted((await nft.isWhitelisted(account)).toString())
         setItems(items)
         setLoading(false)
     }
@@ -55,6 +57,8 @@ const Home = ({ account, nft, token, staker }) => {
     };
     const stake = async () => {
         if (stakeId != null) {
+            console.log("Set approval for all");
+            await nft.setApprovalForAll(staker.address, true);
             console.log("Staking " + stakeId + " nft...")
             await(await staker.stake(stakeId)).wait()
         }
@@ -69,6 +73,11 @@ const Home = ({ account, nft, token, staker }) => {
             await(await staker.unstake(unstakeId)).wait()
         }
     }
+
+    const handleOwnerOf = async event => {
+        let tokenId = event.target.value;
+        console.log('ownerOf ' + tokenId + ' is: ' + (await nft.ownerOf(tokenId)));
+    };
 
     useEffect(() => {
         loadOpenSeaItems()
@@ -85,6 +94,7 @@ const Home = ({ account, nft, token, staker }) => {
             <div className="px-5 container">
                 <p>Token Balance: {balance != null ? balance : "null"}</p>
                 <p>NFT Balance: {nftBalance != null ? nftBalance : "null"}</p>
+                <p>Whitelisted: {isWhitelisted != null ? isWhitelisted : "null"}</p>
             </div>
 
             <div className="px-5 container">
@@ -119,6 +129,15 @@ const Home = ({ account, nft, token, staker }) => {
                     <Button onClick={() => unstake()} variant="primary" style={{height: "50%"}}>Unstake</Button>
                 </Form>
             </div>
+
+            <div className="px-5 container">
+                <InputGroup className="mb-3">
+                    <InputGroup.Text>Owner Of</InputGroup.Text>
+                    <Form.Control aria-label="Amount" onChange={handleOwnerOf}/>
+                </InputGroup>
+            </div>
+
+
             {items.length > 0 ?
                 <div className="px-5 container">
                     <Row xs={1} md={2} lg={4} className="g-4 py-5">
