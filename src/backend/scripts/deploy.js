@@ -1,5 +1,6 @@
 // Before deploy:
 // wallet address of the team for the 333 NFTs?
+// should the 22 000 000 tokens be minted on the nft staker address?
 
 async function main() {
 
