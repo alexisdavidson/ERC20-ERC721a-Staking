@@ -7,15 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract NFTStaker {
     ERC721A public parentNFT;
-    IERC20 public immutable rewardsToken;
-
-    // Duration of rewards to be paid out (in seconds)
-    uint public duration;
-    // Timestamp of when the rewards finish
-    uint public finishAt;
+    ERC20 public rewardsToken;
 
     // Reward to be paid out per second
-    uint public rewardRate;
+    uint256 public rewardRate;
 
     // map staker address to stake details (stakes[address][tokenId] = timestamp)
     mapping(address => mapping(uint256 => uint256)) public stakes;
@@ -23,6 +18,7 @@ contract NFTStaker {
     constructor(address nftAddress, address rewardsTokenAddress) {
         parentNFT = ERC721A(nftAddress);
         rewardsToken = ERC20(rewardsTokenAddress);
+        rewardRate = 5 * 10**uint(rewardsToken.decimals()) / 1 days; // 5 per day
     }
 
     function stake(uint256 _tokenId) public {
@@ -40,16 +36,5 @@ contract NFTStaker {
         rewardsToken.transfer(msg.sender, reward);
 
         delete stakes[msg.sender][_tokenId];
-    }      
-
-     function onERC721AReceived(
-        address operator,
-        address from,
-        uint256 id,
-        uint256 value,
-        bytes calldata data
-    ) external returns (bytes4) {
-        return bytes4(keccak256("onERC721AReceived(address,address,uint256,uint256,bytes)"));
     }
-
 }
