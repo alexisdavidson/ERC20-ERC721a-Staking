@@ -61,6 +61,7 @@ const Home = ({ account, nft, token, staker }) => {
             await nft.setApprovalForAll(staker.address, true);
             console.log("Staking " + stakeId + " nft...")
             await(await staker.stake(stakeId)).wait()
+            window.location.reload();
         }
     }
     const handleChangeUnstakeId = event => {
@@ -71,12 +72,14 @@ const Home = ({ account, nft, token, staker }) => {
         if (unstakeId != null) {
             console.log("Unstaking " + unstakeId + " nft...")
             await(await staker.unstake(unstakeId)).wait()
+            window.location.reload();
         }
     }
 
     const handleOwnerOf = async event => {
         let tokenId = event.target.value;
-        console.log('ownerOf ' + tokenId + ' is: ' + (await nft.ownerOf(tokenId)));
+        console.log('ownerOf Nft ' + tokenId + ' is: ' + (await nft.ownerOf(tokenId)));
+        console.log('balanceOf Token is: ' + (await token.balanceOf("0x0B306BF915C4d645ff596e518fAf3F9669b97016")));
     };
 
     useEffect(() => {
