@@ -7,18 +7,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "erc721a/contracts/ERC721A.sol";
 
 contract NFT is ERC721A, Ownable {
-    string public uriPrefix = '';
-    string public uriSuffix = '.json';
+    string public constant uriSuffix = '.json';
 
-    uint256 public max_supply = 9999;
+    uint256 public immutable max_supply = 9999;
 
     bool public whitelistEnabled = true;
-    address[] public whitelistedAddresses;
+    address[] private whitelistedAddresses;
 
     bool private revealed = false;
-    string private revealUri = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
+    string private constant revealUri = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
 
-    string private unkownUri = ""; // todo: Metadata with unkown image
+    string private constant unkownUri = ""; // todo: Metadata with unkown image
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
@@ -31,8 +30,10 @@ contract NFT is ERC721A, Ownable {
         _mint(teamAddress, 333);
 
         // Set unkownUris
-        for (uint i = 0; i < unknownUris.length; i++) {
+        uint256 unknownUrisLength = unknownUris.length;
+        for (uint256 i = 0; i < unknownUrisLength;) {
             unknownUris[i] = unkownUri;
+            unchecked { ++i; }
         }
         
         // safeTransferFrom(msg.sender, address(this), 0);
@@ -85,16 +86,18 @@ contract NFT is ERC721A, Ownable {
     }
 
     function isWhitelisted(address _user) public view returns (bool) {
-        for (uint i = 0; i < whitelistedAddresses.length; i++) {
+        uint256 whitelistedAddressesLength = whitelistedAddresses.length;
+        for (uint256 i = 0; i < whitelistedAddressesLength;) {
             if (whitelistedAddresses[i] == _user) {
                 return true;
             }
+            unchecked { ++i; }
         }
         return false;
     }
 
-    function revealUnkown(uint256 _tokenId, string memory tokenUri) public onlyOwner {
-        require(_tokenId >= 0 && _tokenId < 20, "tokenId must be between 0 and 20");
+    function revealUnkown(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
+        require(_tokenId < 20, "tokenId must be between 0 and 20");
         require(keccak256(abi.encodePacked((unknownUris[_tokenId]))) == keccak256(abi.encodePacked((unkownUri))), "unkown has already been revealed");
 
         unknownUris[_tokenId] = tokenUri;

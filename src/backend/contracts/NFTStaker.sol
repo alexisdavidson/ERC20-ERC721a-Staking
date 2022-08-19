@@ -38,9 +38,6 @@ contract NFTStaker is ERC721Holder {
         uint256 stakingTime = block.timestamp - stakes[msg.sender][_tokenId];
         uint256 reward = stakingTime * rewardRate;
 
-        console.log('reward ', reward);
-        console.log('balance ', rewardsToken.balanceOf(address(this)));
-
         rewardsToken.transfer(msg.sender, reward);
 
         delete stakes[msg.sender][_tokenId];

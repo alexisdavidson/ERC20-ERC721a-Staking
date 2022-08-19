@@ -28,6 +28,7 @@ const Home = ({ account, nft, token, staker }) => {
           return null
         })
 
+        console.log("Current user account: " + account)
         setBalance((await token.balanceOf(account)).toString())
         setNftBalance((await nft.balanceOf(account)).toString())
         setIsWhitelisted((await nft.isWhitelisted(account)).toString())
@@ -79,7 +80,7 @@ const Home = ({ account, nft, token, staker }) => {
     const handleOwnerOf = async event => {
         let tokenId = event.target.value;
         console.log('ownerOf Nft ' + tokenId + ' is: ' + (await nft.ownerOf(tokenId)));
-        console.log('balanceOf Token is: ' + (await token.balanceOf("0x0B306BF915C4d645ff596e518fAf3F9669b97016")));
+        console.log('balanceOf Token is: ' + (await token.balanceOf(staker.address)));
     };
 
     useEffect(() => {
