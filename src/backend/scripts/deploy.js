@@ -1,6 +1,8 @@
 // Before deploy:
 // -Wallet address of the team for the 333 NFTs?
 // -Whitelist addresses?
+// -gelato token name and symbol
+// -gelato nft symbol
 
 async function main() {
 

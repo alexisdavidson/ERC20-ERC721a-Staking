@@ -17,7 +17,7 @@ contract NFT is ERC721A, Ownable {
     bool private revealed = false;
     string private constant revealUri = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
 
-    string private constant unkownUri = ""; // todo: Metadata with unkown image
+    string private constant unkownUri = "unkownURI"; // todo: Metadata with unkown image
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
@@ -40,7 +40,7 @@ contract NFT is ERC721A, Ownable {
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
-        require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token');
+        require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token ');
 
         if (revealed == false) {
             return revealUri;
@@ -57,6 +57,7 @@ contract NFT is ERC721A, Ownable {
     }
 
     function mint(uint256 quantity) external payable {
+        require(totalSupply() + quantity < max_supply, 'Cannot mint more than max supply');
         _mint(msg.sender, quantity);
     }
 
