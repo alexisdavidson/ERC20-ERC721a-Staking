@@ -9,7 +9,7 @@ contract Token is ERC20 {
     constructor() ERC20("GelatoTokenName", "GelatoTokenSymbol") { }
 
     function claimInitialSupply() external {
-        require(initialSupplyClaimed == false);
+        require(initialSupplyClaimed == false, 'Initial supply has already been claimed');
         initialSupplyClaimed = true;
         
         // Mint 222'000'000 tokens
