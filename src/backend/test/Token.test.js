@@ -27,12 +27,6 @@ describe("Token", async function() {
         it("Should track name and symbol of the token", async function() {
             expect(await token.name()).to.equal("GelatoTokenName")
             expect(await token.symbol()).to.equal("GelatoTokenSymbol")
-
-            // Nft Staker contract claims the initial supply
-            expect((await token.balanceOf(nftStaker.address)).toString()).to.equals("222000000000000000000000000");
-            expect((await token.totalSupply()).toString()).to.equals("222000000000000000000000000");
-            expect((await token.initialSupplyClaimed())).to.equals(true);
-            await expect((token.claimInitialSupply())).to.be.revertedWith('Initial supply has already been claimed');
         })
     })
 })
