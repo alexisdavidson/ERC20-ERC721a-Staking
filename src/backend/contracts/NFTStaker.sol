@@ -4,10 +4,11 @@ pragma solidity ^0.8.4;
 import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 import "./Token.sol";
 
-contract NFTStaker is ERC721Holder {
+contract NFTStaker is ERC721Holder, ReentrancyGuard {
     ERC721A public parentNFT;
     Token public rewardsToken;
 
@@ -30,7 +31,7 @@ contract NFTStaker is ERC721Holder {
         parentNFT.safeTransferFrom(msg.sender, address(this), _tokenId);
     } 
 
-    function unstake(uint256 _tokenId) public {
+    function unstake(uint256 _tokenId) public nonReentrant {
         // Unstake NFT from this smart contract
         parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
 
