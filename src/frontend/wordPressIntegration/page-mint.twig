@@ -1,0 +1,60 @@
+{% extends "_base.twig" %}
+
+{% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.3/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.6.2/ethers.umd.min.js"></script>
+
+	<script type="text/javascript">
+		const nftabi = [ { } ]
+		const mintFunction = async function() {
+			console.log('hi3')
+    		const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+		};
+	</script>
+
+	<div class="content-wrapper-mint3" style="background: black; min-height: 100vh;">
+	<div class="container">
+	<div class="row">
+	<div class="col-12 col-lg-8 offset-lg-2">
+		<article class="post-type-{{post.post_type}}" id="post-{{post.ID}}">
+			<section class="article-content">
+				<h1 class="article-h1">{{post.title}}</h1>
+				<div class="article-body">
+					{{post.content}}
+					<div class="container h-100">
+						<div class="row align-items-center h-100">
+							<div class="col-12 col-md-6 offset-md-3">
+								<div class="section__inner">
+									<div class="section__box" style="text-align: center;>
+										<button id="" class="point-close"><i class="fas fa-times"></i></button>
+										{# Mint integration #}
+										<h3 class="section__title ">PUBLIC MINT</h3>
+										<p class="section__cta mb-5">
+											<button class="mint btn btn-secondary" onClick="mintFunction()">
+												<span style="fontSize: 35px;">Buy</span> <br/>
+												<span style="fontSize: 20px;">0.056 ETH</span>
+											</button>
+											<br/>
+											Click Buy to mint your NFT.
+										</p>
+										<p class="section__cta mt-5">
+											Total Minted
+											<br/><span class="btn btn-dark disabled" style="minWidth: 200px; fontSize: 20px;">
+												2/ 100
+											</span>
+										</p>
+										<p className="mt-5" style="color: gray;">
+											Please make sure that you are connected to the right network (Ethereum Mainnet). Please note: Once you make the purchase, you cannot undo it.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</article>
+	</div>
+	</div>
+	</div><!-- /content-wrapper -->
+{% endblock %}
