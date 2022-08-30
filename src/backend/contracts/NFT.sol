@@ -14,10 +14,7 @@ contract NFT is ERC721A, Ownable {
     bool public whitelistEnabled = true;
     address[] private whitelistedAddresses;
 
-    bool private revealed = false;
-    string private constant revealUri = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB";
-
-    string private constant unkownUri = "unkownURI"; // todo: Metadata with unkown image
+    string private constant unkownNotRevealedUri = "Not revealed yet";
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
@@ -32,21 +29,15 @@ contract NFT is ERC721A, Ownable {
         // Set unkownUris
         uint256 unknownUrisLength = unknownUris.length;
         for (uint256 i = 0; i < unknownUrisLength;) {
-            unknownUris[i] = unkownUri;
+            unknownUris[i] = unkownNotRevealedUri;
             unchecked { ++i; }
         }
-        
-        // safeTransferFrom(msg.sender, address(this), 0);
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token ');
 
-        if (revealed == false) {
-            return revealUri;
-        }
-
-        if (_tokenId < 20) { // 20 first tokens are Unkowns
+        if (_tokenId < 20 && isUnkownRevealed(_tokenId)) { // 20 first tokens are Unkowns
             return unknownUris[_tokenId];
         }
 
@@ -62,19 +53,15 @@ contract NFT is ERC721A, Ownable {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmNmBHVHMHt8kvT2VtPDjZ6sjGjyjJ5LBsr1DhnLvzTZss/";
+        return "ipfs://Qmbx9io6LppmpvavX3EqZY8igQxPZh7koUzW3mPRLkLQir/";
     }
     
     function baseTokenURI() public pure returns (string memory) {
         return _baseURI();
     }
 
-    function revealCollection() public {
-        revealed = true;
-    }
-
     function contractURI() public pure returns (string memory) {
-        return "ipfs://QmTA41cxgi62ik86g3e1m8sbgvPus7SLZwoNjFrCDUGvxq/";
+        return "ipfs://QmWBjrx4QnwwLWzu1GosaLw1wv3ikvC5Tq7sJUcqEzr3So/";
     }
 
     function setWhitelistEnabled(bool _state) public onlyOwner {
@@ -99,8 +86,12 @@ contract NFT is ERC721A, Ownable {
 
     function revealUnkown(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
         require(_tokenId < 20, "tokenId must be between 0 and 20");
-        require(keccak256(abi.encodePacked((unknownUris[_tokenId]))) == keccak256(abi.encodePacked((unkownUri))), "unkown has already been revealed");
+        require(!isUnkownRevealed(_tokenId), "unkown has already been revealed");
 
         unknownUris[_tokenId] = tokenUri;
+    }
+
+    function isUnkownRevealed(uint256 _tokenId) public view returns(bool) {
+        return keccak256(abi.encodePacked((unknownUris[_tokenId]))) != keccak256(abi.encodePacked((unkownNotRevealedUri)));
     }
 }

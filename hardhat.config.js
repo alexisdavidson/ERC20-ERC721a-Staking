@@ -14,7 +14,10 @@ module.exports = {
      },
      rinkeby: {
        url: process.env.REACT_APP_API_URL_RINKEBY,
-       accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_RINKEBY]
+       accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_RINKEBY],
+       allowUnlimitedContractSize: true,
+       gas: 2100000,
+       gasPrice: 8000000000,
      },
      matic: {
        url: process.env.REACT_APP_API_URL_MATIC,
@@ -22,7 +25,9 @@ module.exports = {
      },
      mumbai: {
        url: process.env.REACT_APP_API_URL_MUMBAI,
-       accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_MUMBAI]
+       accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_MUMBAI],
+       gas: 2100000,
+       gasPrice: 8000000000
      }
   },
   paths: {
