@@ -680,8 +680,8 @@
     }
   ];
         const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
-		const mintFunction = async function() {
-			console.log('mintFunction called')
+		const checkWhitelist = async function() {
+			console.log('checkWhitelist called')
 
     		const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 			const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -689,47 +689,19 @@
 			
     		const nft = new ethers.Contract(nftaddress, nftabi, signer)
 
-			console.log("Mint nft...")
-			//let priceInWei = await nft.getPrice();
-			//console.log("Price: " + priceInWei + " wei");
-			//await(await nft.mint({ value: priceInWei })).wait()
-			await(await nft.mint(1)).wait()
+			console.log("isWhitelisted...")
+			let isWhitelisted = await nft.isWhitelisted(accounts[0])
+			console.log("isWhitelisted: " + isWhitelisted)
+
+			let whitelistedText = "You are "
+			if (isWhitelisted)
+				whitelistedText += "whitelisted!"
+			else
+				whitelistedText += "not whitelisted."
+
+			$("#whitelist-status").text(whitelistedText);
 		};
 		
-		const updatePrice = async function() {
-            const web3 = new Web3(window.ethereum);
-            const contract = new web3.eth.Contract(nftabi, nftaddress);
-
-            contract.methods.getNFTPrice().call().then((res) => {
-				console.log("current price:" + res)
-				$("#current-price").text(Web3.utils.fromWei(web3.utils.toBN(res), 'ether'));
-			}).catch((err) => {
-				console.log(err);
-            });
-        }
-        // updatePrice();
-		
-		const updateStats = async function() {      
-			const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
-			// const urlApi = 'https://api.opensea.io/api/v1' // mainnet
-			const nameCollection = 'gelatoverse-genesis-v2'
-			const finalUrl = `${urlApi}/collection/${nameCollection}`
-			console.log("Sending api call for stats to " + finalUrl)
-
-			let stats = await fetch(finalUrl)
-			.then((res) => res.json())
-			.then((res) => {
-				$("#total-minted").text(res.collection.stats.count);
-			})
-			.catch((e) => {
-				console.error(e)
-				$("#total-minted").text("?");
-			})
-
-			console.log("Finished loading stats")
-			console.log(stats)
-        }
-        updateStats();
 	</script>
 
 	<div class="content-wrapper-mint3" style="background: black; min-height: 100vh;">
@@ -748,23 +720,19 @@
 									<div class="section__box" style="text-align: center;>
 										<button id="" class="point-close"><i class="fas fa-times"></i></button>
 										{# Mint integration #}
-										<h3 class="section__title ">PUBLIC MINT</h3>
+										<h3 class="section__title ">WHITELIST</h3>
+										<p className="mt-5" style="color: gray;">
+											<span id="whitelist-status" style="fontSize: 20px;"></span>
+										</p>
 										<p class="section__cta mb-5">
-											<button class="mint btn btn-secondary" onClick="mintFunction()">
-												<span style="fontSize: 35px;">Buy</span> 
-												<!-- <br/> <span id="current-price" style="fontSize: 20px;">?</span> ETH -->
+											<button class="mint btn btn-secondary" onClick="checkWhitelist()">
+												<span style="fontSize: 35px;">Check</span> 
 											</button>
 											<br/>
-											Click Buy to mint your NFT.
-										</p>
-										<p class="section__cta mt-5">
-											Total Minted
-											<br/><span class="btn btn-dark disabled" style="minWidth: 200px; fontSize: 20px;"> 
-												<span id="total-minted">?</span>/ 9999
-											</span>
+											Click Check to verify your whitelist status.
 										</p>
 										<p className="mt-5" style="color: gray;">
-											Please make sure that you are connected to the right network (Ethereum Mainnet). Please note: Once you make the purchase, you cannot undo it.
+											Please make sure that you are connected to the right network (Ethereum Mainnet).
 										</p>
 									</div>
 								</div>
