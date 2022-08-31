@@ -679,53 +679,93 @@
       "type": "function"
     }
   ];
+
+  
+		const tokenabi = []
+
+
+		const nftstakerabi = []
+
+
     const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
+    const tokenaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
+    const nftstakeraddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
     let items = [];
 
-		const stakeFunction = async function() {
-			console.log('stakeFunction called ' + items[0]?.token_id)
-
+    
+    const main = async function() {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-			const provider = new ethers.providers.Web3Provider(window.ethereum)
-			const signer = provider.getSigner()
-			
-      //const nft = new ethers.Contract(nftaddress, nftabi, signer)
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      // const nftstaker = new ethers.Contract(nftstakeraddress, nftstakerabi, signer)
+      
+      const noTokenFound = function() {
+          console.log("No tokens found for this address");
+      }
 
-			console.log("Stake nft...")
-			//let priceInWei = await nft.getPrice();
-			//console.log("Price: " + priceInWei + " wei");
-			//await(await nft.mint({ value: priceInWei })).wait()
-			//await(await nft.mint(1)).wait()
-		};
+      const isTokenStaked = async function() {
+        if (items.length > 0) {
+          let isStaked = await nftstaker.isTokenStaked(items[0]?.token_id);
+          console.log("isTokenStaked: " + isStaked);
+        }
+        else {
+          noTokenFound();
+        }
+      }
 
-    const loadOpenSeaItems = async () => {
-      console.log("loadOpenSeaItems...");
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-			const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
-			// const urlApi = 'https://api.opensea.io/api/v1' // mainnet
-			const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
-			console.log("Sending api call for items to " + finalUrl)
+      const stakeFunction = async function() {
+        if (items.length > 0) {
+          console.log('stakeFunction called ' + items[0]?.token_id)
 
-      items = await fetch(finalUrl)
-      .then((res) => res.json())
-      .then((res) => {
-        return res.assets
-      })
-      .catch((e) => {
-        console.error(e)
-        console.error('Could not talk to OpenSea')
-        return null
-      })
+          //const nft = new ethers.Contract(nftaddress, nftabi, signer)
 
-      console.log("items loaded: ");
-      console.log(items);
+          console.log("Stake nft...")
+          //let priceInWei = await nft.getPrice();
+          //console.log("Price: " + priceInWei + " wei");
+          //await(await nft.mint({ value: priceInWei })).wait()
+          //await(await nft.mint(1)).wait()
+        }
+        else {
+          noTokenFound();
+        }
+      };
 
-      $("#items-count").text(items?.length + " Items");
-      $("#item-name").text(items[0]?.name);
-      $("#item-description").text(items[0]?.description);
-      document.getElementById("item-image").src = items[0]?.image_url;
+      const loadOpenSeaItems = async () => {
+        console.log("loadOpenSeaItems...");
+        const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
+        // const urlApi = 'https://api.opensea.io/api/v1' // mainnet
+        const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
+        console.log("Sending api call for items to " + finalUrl)
+
+        items = await fetch(finalUrl)
+        .then((res) => res.json())
+        .then((res) => {
+          return res.assets
+        })
+        .catch((e) => {
+          console.error(e)
+          console.error('Could not talk to OpenSea')
+          return null
+        })
+
+        console.log("items loaded: ");
+        console.log(items);
+
+        if (items != null && items.length > 0) {
+          $("#items-count").text(items?.length + " Items");
+          $("#item-name").text(items[0]?.name);
+          $("#item-description").text(items[0]?.description);
+          document.getElementById("item-image").src = items[0]?.image_url;
+        }
+        else {
+          noTokenFound();
+        }
+      }
+      loadOpenSeaItems();
+      // await isTokenStaked();
+
     }
-    loadOpenSeaItems();
+    main()
 	</script>
 
 	<div class="content-wrapper-mint3" style="background: black; min-height: 100vh;">

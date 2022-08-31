@@ -43,4 +43,8 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard {
 
         delete stakes[msg.sender][_tokenId];
     }
+
+    function isTokenStaked(uint256 _tokenId) public view returns(bool) {
+        return stakes[msg.sender][_tokenId] > 0;
+    }
 }
