@@ -1308,6 +1308,15 @@
 
       const loadStakedItems = async () => {
         const items = []
+        
+        // map staker address to stake details (stakes[address][tokenId] = timestamp)
+        //mapping(address => mapping(uint256 => uint256)) public stakes;
+        
+        try {
+          items = await nftstaker.stakes()
+        } catch(error) {
+          console.log("nftstaker.stakes " + error)
+        }
 
         console.log("Staked items loaded: ");
         console.log(items);
@@ -1319,7 +1328,7 @@
         const stakedItems = await loadStakedItems();
         let openSeaItems = await loadOpenSeaItems();
         // todo: Implement the logic that removes any element from openSeaItems that is in stakedItems
-        
+
         let cardsHtml = ""
         
         if (openSeaItems != null && openSeaItems.length > 0) {
