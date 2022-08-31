@@ -11,11 +11,17 @@ contract NFT is ERC721A, Ownable {
 
     uint256 public immutable max_supply = 9941;
 
+    uint public amountMintPerAccount = 1;
+
     bool public whitelistEnabled = true;
     address[] private whitelistedAddresses;
 
+    bool public publicSaleEnabled;
+
     string private constant unkownNotRevealedUri = "Not revealed yet";
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
+
+    uint256 public price;
 
     constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
     {
@@ -49,6 +55,9 @@ contract NFT is ERC721A, Ownable {
 
     function mint(uint256 quantity) external payable {
         require(totalSupply() + quantity < max_supply, 'Cannot mint more than max supply');
+        require(publicSaleEnabled || isWhitelisted(address(msg.sender)), 'You are not whitelisted');
+        require(balanceOf(msg.sender) < amountMintPerAccount, 'Each address may only mint x NFTs!');
+        require(msg.value >= getPrice(), "Not enough ETH sent; check price!");
         _mint(msg.sender, quantity);
     }
 
@@ -62,6 +71,10 @@ contract NFT is ERC721A, Ownable {
 
     function contractURI() public pure returns (string memory) {
         return "ipfs://QmWBjrx4QnwwLWzu1GosaLw1wv3ikvC5Tq7sJUcqEzr3So/";
+    }
+
+    function setPublicSaleEnabled(bool _state) public onlyOwner {
+        publicSaleEnabled = _state;
     }
 
     function setWhitelistEnabled(bool _state) public onlyOwner {
@@ -93,5 +106,17 @@ contract NFT is ERC721A, Ownable {
 
     function isUnkownRevealed(uint256 _tokenId) public view returns(bool) {
         return keccak256(abi.encodePacked((unknownUris[_tokenId]))) != keccak256(abi.encodePacked((unkownNotRevealedUri)));
+    }
+
+    function getPrice() view public returns(uint) {
+        return price;
+    }
+
+    function setPrice(uint _price) public onlyOwner {
+        price = _price;
+    }
+
+    function setAmountMintPerAccount(uint _amountMintPerAccount) public onlyOwner {
+        amountMintPerAccount = _amountMintPerAccount;
     }
 }
