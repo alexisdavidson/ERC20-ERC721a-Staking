@@ -682,20 +682,20 @@
     const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
     let items = [];
 
-		const mintFunction = async function() {
-			console.log('mintFunction called')
+		const stakeFunction = async function() {
+			console.log('stakeFunction called ' + items[0]?.token_id)
 
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 			const provider = new ethers.providers.Web3Provider(window.ethereum)
 			const signer = provider.getSigner()
 			
-      const nft = new ethers.Contract(nftaddress, nftabi, signer)
+      //const nft = new ethers.Contract(nftaddress, nftabi, signer)
 
-			console.log("Mint nft...")
+			console.log("Stake nft...")
 			//let priceInWei = await nft.getPrice();
 			//console.log("Price: " + priceInWei + " wei");
 			//await(await nft.mint({ value: priceInWei })).wait()
-			await(await nft.mint(1)).wait()
+			//await(await nft.mint(1)).wait()
 		};
 
     const loadOpenSeaItems = async () => {
@@ -721,6 +721,9 @@
       console.log(items);
 
       $("#items-count").text(items?.length + " Items");
+      $("#item-name").text(items[0]?.name);
+      $("#item-description").text(items[0]?.description);
+      document.getElementById("item-image").src = items[0]?.image_url;
     }
     loadOpenSeaItems();
 	</script>
@@ -742,8 +745,22 @@
 										<button id="" class="point-close"><i class="fas fa-times"></i></button>
 										{# Mint integration #}
 										<h3 class="section__title ">MISSIONS</h3>
-										<p className="mt-5" style="color: gray;">
-											<span id="items-count" style="fontSize: 20px;">Loading items...</span>
+										<!--<p class="mt-5"><span id="items-count" style="fontSize: 20px;">Loading items...</span></p>-->
+										<p class="mt-5">
+                      <div class="card bg-dark">
+                          <img id="item-image" class="card-img-top" />
+                          <div class="card-body">
+                            <div id="item-name" class="card-title"></div>
+                            <!--<div id="item-description" class="card-text"></div>-->
+                          </div>
+                          <div class="card-footer">
+                            <div className='d-grid'>
+                                <button class="mint btn btn-secondary" onClick="stakeFunction()">
+                                    Stake
+                                </button>
+                            </div>
+                          </div>
+                      </div>
 										</p>
 									</div>
 								</div>
