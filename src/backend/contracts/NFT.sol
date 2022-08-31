@@ -9,7 +9,7 @@ import "erc721a/contracts/ERC721A.sol";
 contract NFT is ERC721A, Ownable {
     string public constant uriSuffix = '.json';
 
-    uint256 public immutable max_supply = 9999;
+    uint256 public immutable max_supply = 9941;
 
     bool public whitelistEnabled = true;
     address[] private whitelistedAddresses;
