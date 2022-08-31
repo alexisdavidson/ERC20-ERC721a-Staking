@@ -1,4 +1,5 @@
 // Before deploy:
+// transfer ownership to? (add code)
 // -Wallet address of the team for the 333 NFTs? mainnet: 0x61603b8A09C2Aa8f663B43c22C9ceBeC00FC6FeC
 // team rinkeby test account: 0xCdb34512BD8123110D20852ebEF947275f7fD1Ce
 // -Whitelist addresses?

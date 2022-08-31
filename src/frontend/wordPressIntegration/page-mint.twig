@@ -784,7 +784,13 @@
 			//let priceInWei = await nft.getPrice();
 			//console.log("Price: " + priceInWei + " wei");
 			//await(await nft.mint({ value: priceInWei })).wait()
-			await(await nft.mint(1)).wait()
+      try {
+			  await(await nft.mint(1)).wait()
+      }
+      catch (error) {
+        console.error("Custom error handling: " + error);
+        document.getElementById("error-message").innerHTML = "<br/>" + error
+      };
 		};
 		
 		const updatePrice = async function() {
@@ -847,6 +853,7 @@
 											</button>
 											<br/>
 											Click Buy to mint your NFT.
+                      <span id="error-message" style="color: red;"></span>
 										</p>
 										<p class="section__cta mt-5">
 											Total Minted
