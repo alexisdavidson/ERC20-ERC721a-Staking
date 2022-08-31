@@ -679,15 +679,17 @@
       "type": "function"
     }
   ];
-        const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
+    const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
+    let items = [];
+
 		const mintFunction = async function() {
 			console.log('mintFunction called')
 
-    		const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 			const provider = new ethers.providers.Web3Provider(window.ethereum)
 			const signer = provider.getSigner()
 			
-    		const nft = new ethers.Contract(nftaddress, nftabi, signer)
+      const nft = new ethers.Contract(nftaddress, nftabi, signer)
 
 			console.log("Mint nft...")
 			//let priceInWei = await nft.getPrice();
@@ -695,41 +697,32 @@
 			//await(await nft.mint({ value: priceInWei })).wait()
 			await(await nft.mint(1)).wait()
 		};
-		
-		const updatePrice = async function() {
-            const web3 = new Web3(window.ethereum);
-            const contract = new web3.eth.Contract(nftabi, nftaddress);
 
-            contract.methods.getNFTPrice().call().then((res) => {
-				console.log("current price:" + res)
-				$("#current-price").text(Web3.utils.fromWei(web3.utils.toBN(res), 'ether'));
-			}).catch((err) => {
-				console.log(err);
-            });
-        }
-        // updatePrice();
-		
-		const updateStats = async function() {      
+    const loadOpenSeaItems = async () => {
+      console.log("loadOpenSeaItems...");
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 			const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
 			// const urlApi = 'https://api.opensea.io/api/v1' // mainnet
-			const nameCollection = 'gelatoverse-genesis-v2'
-			const finalUrl = `${urlApi}/collection/${nameCollection}`
-			console.log("Sending api call for stats to " + finalUrl)
+			const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
+			console.log("Sending api call for items to " + finalUrl)
 
-			let stats = await fetch(finalUrl)
-			.then((res) => res.json())
-			.then((res) => {
-				$("#total-minted").text(res.collection.stats.count);
-			})
-			.catch((e) => {
-				console.error(e)
-				$("#total-minted").text("?");
-			})
+      items = await fetch(finalUrl)
+      .then((res) => res.json())
+      .then((res) => {
+        return res.assets
+      })
+      .catch((e) => {
+        console.error(e)
+        console.error('Could not talk to OpenSea')
+        return null
+      })
 
-			console.log("Finished loading stats")
-			console.log(stats)
-        }
-        updateStats();
+      console.log("items loaded: ");
+      console.log(items);
+
+      $("#items-count").text(items?.length + " Items");
+    }
+    loadOpenSeaItems();
 	</script>
 
 	<div class="content-wrapper-mint3" style="background: black; min-height: 100vh;">
@@ -748,23 +741,9 @@
 									<div class="section__box" style="text-align: center;>
 										<button id="" class="point-close"><i class="fas fa-times"></i></button>
 										{# Mint integration #}
-										<h3 class="section__title ">PUBLIC MINT</h3>
-										<p class="section__cta mb-5">
-											<button class="mint btn btn-secondary" onClick="mintFunction()">
-												<span style="fontSize: 35px;">Buy</span> 
-												<!-- <br/> <span id="current-price" style="fontSize: 20px;">?</span> ETH -->
-											</button>
-											<br/>
-											Click Buy to mint your NFT.
-										</p>
-										<p class="section__cta mt-5">
-											Total Minted
-											<br/><span class="btn btn-dark disabled" style="minWidth: 200px; fontSize: 20px;"> 
-												<span id="total-minted">?</span>/ 9999
-											</span>
-										</p>
+										<h3 class="section__title ">MISSIONS</h3>
 										<p className="mt-5" style="color: gray;">
-											Please make sure that you are connected to the right network (Ethereum Mainnet). Please note: Once you make the purchase, you cannot undo it.
+											<span id="items-count" style="fontSize: 20px;">Loading items...</span>
 										</p>
 									</div>
 								</div>
