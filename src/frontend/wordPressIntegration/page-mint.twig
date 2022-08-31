@@ -218,6 +218,19 @@
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "amountMintPerAccount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -294,6 +307,19 @@
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -434,6 +460,32 @@
     },
     {
       "inputs": [],
+      "name": "price",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "publicSaleEnabled",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "renounceOwnership",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -511,6 +563,19 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_amountMintPerAccount",
+          "type": "uint256"
+        }
+      ],
+      "name": "setAmountMintPerAccount",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "operator",
           "type": "address"
@@ -522,6 +587,32 @@
         }
       ],
       "name": "setApprovalForAll",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        }
+      ],
+      "name": "setPrice",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_state",
+          "type": "bool"
+        }
+      ],
+      "name": "setPublicSaleEnabled",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -679,7 +770,7 @@
       "type": "function"
     }
   ];
-        const nftaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
+        const nftaddress = '0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9'; // todo: replace with correct address and abi
 		const mintFunction = async function() {
 			console.log('mintFunction called')
 
@@ -712,7 +803,7 @@
 		const updateStats = async function() {      
 			const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
 			// const urlApi = 'https://api.opensea.io/api/v1' // mainnet
-			const nameCollection = 'gelatoverse-genesis-v2'
+			const nameCollection = 'gelatoverse-genesis-v3'
 			const finalUrl = `${urlApi}/collection/${nameCollection}`
 			console.log("Sending api call for stats to " + finalUrl)
 

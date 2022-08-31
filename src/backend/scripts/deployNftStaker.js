@@ -7,7 +7,7 @@ async function main() {
 
   // Deploy contracts
   const NFTStaker = await ethers.getContractFactory("NFTStaker");
-  const nftStaker = await NFTStaker.deploy("0x697fe68A82Ff0BbA2c1149eE39947d3425EBA275", "0xb845EE611F14C602908Aa5986E839300AE21AFE5");
+  const nftStaker = await NFTStaker.deploy("0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9", "0x08edb028770140c2AC870C93F75DF94b5AD5157A"); // nftAddress, rewardsTokenAddress)
   
   console.log("NFTStaker contract address", nftStaker.address)
   
