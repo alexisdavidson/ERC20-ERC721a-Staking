@@ -1332,14 +1332,19 @@
     const stakeUnstakeFunction = async function(token_id, isStaked) {
       if (items.length > 0) {
         console.log('stakeUnstakeFunction called ' + token_id)
-        if (!isStaked) {
-          console.log("Set approval for all");
-          await(await nft.setApprovalForAll(nftstakeraddress, true)).wait()
-          console.log("Stake nft...")
-          await(await nftstaker.stake(token_id)).wait()
-        } else {
-          console.log("Unstake nft...")
-          await(await nftstaker.unstake(token_id)).wait()
+        try {
+          if (!isStaked) {
+            console.log("Set approval for all");
+            await(await nft.setApprovalForAll(nftstakeraddress, true)).wait()
+            console.log("Stake nft...")
+            await nftstaker.stake(token_id)
+          } else {
+            console.log("Unstake nft...")
+            await nftstaker.unstake(token_id)
+          }
+        } catch (error) {
+          console.error("Custom error handling: " + error);
+          document.getElementById("items-container").innerHTML = error
         }
       }
       else {
