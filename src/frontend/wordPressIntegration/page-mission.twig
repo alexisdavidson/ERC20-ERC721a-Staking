@@ -695,6 +695,7 @@
     let provider = null;
     let signer = null;
     let nftstaker = null;
+    let isStaked = false;
     
     const main = async function() {
       accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -723,7 +724,7 @@
         console.log("updateIsTokenStaked...");
         if (items.length > 0) {
           try {
-            const isStaked = await nftstaker.isTokenStaked(items[0]?.token_id);
+            isStaked = await nftstaker.isTokenStaked(items[0]?.token_id);
             console.log("isStaked: " + isStaked);
             if (isStaked) {
               $("#button-stake").text("Unstake");
@@ -778,17 +779,16 @@
     }
     main()
     
-    const stakeFunction = async function() {
+    const stakeUnstakeFunction = async function() {
       if (items.length > 0) {
-        console.log('stakeFunction called ' + items[0]?.token_id)
-
-        //const nft = new ethers.Contract(nftaddress, nftabi, signer)
-
-        console.log("Stake nft...")
-        //let priceInWei = await nft.getPrice();
-        //console.log("Price: " + priceInWei + " wei");
-        //await(await nft.mint({ value: priceInWei })).wait()
-        //await(await nft.mint(1)).wait()
+        console.log('stakeUnstakeFunction called ' + items[0]?.token_id)
+        if (!isStaked) {
+          console.log("Stake nft...")
+          await(await staker.stake(items[0]?.token_id)).wait()
+        } else {
+          console.log("Unstake nft...")
+          await(await staker.unstake(items[0]?.token_id)).wait()
+        }
       }
       else {
         noTokenFound();
@@ -826,7 +826,7 @@
                           </div>
                           <div class="card-footer">
                             <div className='d-grid'>
-                                <button id="button-stake" class="mint btn btn-secondary" onClick="stakeFunction()">
+                                <button id="button-stake" class="mint btn btn-secondary" onClick="stakeUnstakeFunction()">
                                     Stake
                                 </button>
                             </div>
