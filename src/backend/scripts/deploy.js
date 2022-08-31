@@ -17,8 +17,8 @@ async function main() {
   const NFT = await ethers.getContractFactory("NFT");
   const Token = await ethers.getContractFactory("Token");
   const NFTStaker = await ethers.getContractFactory("NFTStaker");
-  // const nft = await NFT.deploy("0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]); // Fill with correct input before deploy!
-  const nft = await NFT.deploy("0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", ["0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", "0x1e85F8DAd89e993A2c290B846F48B62B151da8af"]); // Fill with correct input before deploy!
+  const nft = await NFT.deploy("0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]); // (localhost) Fill with correct input before deploy!
+  // const nft = await NFT.deploy("0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", ["0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", "0x1e85F8DAd89e993A2c290B846F48B62B151da8af"]); // (rinkeby) Fill with correct input before deploy!
   const token = await Token.deploy();
   // const nftStaker = await NFTStaker.deploy(nft.address, token.address);
   
