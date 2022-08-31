@@ -1236,7 +1236,6 @@
     const nftaddress = '0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9'; // todo: replace with correct address and abi
     const tokenaddress = '0x08edb028770140c2AC870C93F75DF94b5AD5157A'; // todo: replace with correct address and abi
     const nftstakeraddress = '0xD8CE97D86AB774B80Cb30fBa9acF8Dd47541f364'; // todo: replace with correct address and abi
-    let items = [];
     let accounts = [];
     let provider = null;
     let signer = null;
@@ -1251,11 +1250,6 @@
       token = new ethers.Contract(tokenaddress, tokenabi, signer)
       nftstaker = new ethers.Contract(nftstakeraddress, nftstakerabi, signer)
       nft = new ethers.Contract(nftaddress, nftabi, signer)
-      
-      const noTokenFound = function() {
-        console.log("No tokens found for this address");
-        document.getElementById("items-container").innerHTML = "<p>You need at least 1 Gelato NFT at disposition to start new missions!</p>"
-      }
 
       const updateBalance = async function() {
         console.log("updateBalance...");
@@ -1270,14 +1264,12 @@
         }
       }
 
-      const createCardHtml = async (token_id, name, description, image) => {
-        const isStaked = await nftstaker.isTokenStaked(token_id);
+      const createCardHtml = async (token_id, name, image, isStaked) => {
         const stakeUnstakeText = isStaked ? "Unstake" : "Stake"
         let cardHtml = `<div class="card bg-dark mx-1 my-3">
                           <img class="card-img-top" src="${image}"/>
                           <div class="card-body">
                             <div class="card-title">${name}</div>
-                            <!--<div id="item-description" class="card-text"></div>-->
                           </div>
                           <div class="card-footer">
                             <div class='d-grid'>
@@ -1297,7 +1289,7 @@
         const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
         console.log("Sending api call for items to " + finalUrl)
 
-        items = await fetch(finalUrl)
+        const items = await fetch(finalUrl)
         .then((res) => res.json())
         .then((res) => {
           return res.assets
@@ -1308,47 +1300,65 @@
           return null
         })
 
-        console.log("items loaded: ");
+        console.log("OpenSea items loaded: ");
         console.log(items);
 
-        if (items != null && items.length > 0) {
-
-          let cardsHtml = ""
-          for(i = 0; i < items.length; i ++) {
-            console.log("Card " + i)
-            cardsHtml += await createCardHtml(items[i].token_id, items[i].name, items[i].description, items[i].image_url)
-            document.getElementById("items-container").innerHTML = cardsHtml
-          }
-        }
-        else {
-          noTokenFound();
-        }
+        return items
       }
-      await loadOpenSeaItems();
+
+      const loadStakedItems = async () => {
+        const items = []
+
+        console.log("Staked items loaded: ");
+        console.log(items);
+        
+        return items
+      }
+
+      const createCards = async () => {
+        const stakedItems = await loadStakedItems();
+        let openSeaItems = await loadOpenSeaItems();
+        // todo: Implement the logic that removes any element from openSeaItems that is in stakedItems
+        
+        let cardsHtml = ""
+        
+        if (openSeaItems != null && openSeaItems.length > 0) {
+          for(i = 0; i < openSeaItems.length; i ++)
+            cardsHtml += await createCardHtml(openSeaItems[i].token_id, openSeaItems[i].name, openSeaItems[i].image_url, false)
+        } else {
+          cardsHtml += "<p>You need at least 1 Gelato NFT at disposition to start new missions!</p>"
+        }
+        
+        if (stakedItems != null && stakedItems.length > 0) {
+          for(i = 0; i < stakedItems.length; i ++)
+            cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
+        } else {
+          cardsHtml += "<p>You currently don't have a Gelato NFT in a mission.</p>"
+        }
+
+        document.getElementById("items-container").innerHTML = cardsHtml
+      }
+
+      await createCards();
       await updateBalance();
     }
     main()
     
     const stakeUnstakeFunction = async function(token_id, isStaked) {
-      if (items.length > 0) {
-        console.log('stakeUnstakeFunction called ' + token_id)
-        try {
-          if (!isStaked) {
-            console.log("Set approval for all");
-            await(await nft.setApprovalForAll(nftstakeraddress, true)).wait()
-            console.log("Stake nft...")
-            await nftstaker.stake(token_id)
-          } else {
-            console.log("Unstake nft...")
-            await nftstaker.unstake(token_id)
-          }
-        } catch (error) {
-          console.error("Custom error handling: " + error);
-          document.getElementById("items-container").innerHTML = error
+      console.log('stakeUnstakeFunction called ' + token_id)
+      try {
+        if (!isStaked) {
+          console.log("Set approval for all");
+          await(await nft.setApprovalForAll(nftstakeraddress, true)).wait()
+          console.log("Stake nft...")
+          await nftstaker.stake(token_id)
+        } else {
+          console.log("Unstake nft...")
+          await nftstaker.unstake(token_id)
         }
-      }
-      else {
-        noTokenFound();
+      } catch (error) {
+        console.error("Custom error handling: " + error);
+        document.getElementById("items-container").innerHTML = error
       }
     }
 	</script>
