@@ -691,44 +691,55 @@
     const tokenaddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
     const nftstakeraddress = '0x2c43fdb2fe65932881c704144a99931e53355833'; // todo: replace with correct address and abi
     let items = [];
-
+    let accounts = [];
+    let provider = null;
+    let signer = null;
+    let nftstaker = null;
     
     const main = async function() {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      // const nftstaker = new ethers.Contract(nftstakeraddress, nftstakerabi, signer)
+      accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      provider = new ethers.providers.Web3Provider(window.ethereum)
+      signer = provider.getSigner()
+      // nftstaker = new ethers.Contract(nftstakeraddress, nftstakerabi, signer)
       
       const noTokenFound = function() {
           console.log("No tokens found for this address");
       }
 
-      const isTokenStaked = async function() {
+      const updateBalance = async function() {
+        console.log("updateBalance...");
+        try {
+          const balance = await token.balanceOf(accounts[0]);
+          console.log("balance: " + balance);
+          $("#token-balance").text(balance);
+        }
+        catch(error) {
+          console.log("updateBalance " + error)
+          $("#token-balance").text("error");
+        }
+      }
+
+      const updateIsTokenStaked = async function() {
+        console.log("updateIsTokenStaked...");
         if (items.length > 0) {
-          let isStaked = await nftstaker.isTokenStaked(items[0]?.token_id);
-          console.log("isTokenStaked: " + isStaked);
+          try {
+            const isStaked = await nftstaker.isTokenStaked(items[0]?.token_id);
+            console.log("isStaked: " + isStaked);
+            if (isStaked) {
+              $("#button-stake").text("Unstake");
+            } else {
+              $("#button-stake").text("Stake");
+            }
+          }
+          catch(error) {
+            console.log("updateIsTokenStaked " + error)
+            $("#button-stake").text("error");
+          }
         }
         else {
           noTokenFound();
         }
       }
-
-      const stakeFunction = async function() {
-        if (items.length > 0) {
-          console.log('stakeFunction called ' + items[0]?.token_id)
-
-          //const nft = new ethers.Contract(nftaddress, nftabi, signer)
-
-          console.log("Stake nft...")
-          //let priceInWei = await nft.getPrice();
-          //console.log("Price: " + priceInWei + " wei");
-          //await(await nft.mint({ value: priceInWei })).wait()
-          //await(await nft.mint(1)).wait()
-        }
-        else {
-          noTokenFound();
-        }
-      };
 
       const loadOpenSeaItems = async () => {
         console.log("loadOpenSeaItems...");
@@ -761,11 +772,28 @@
           noTokenFound();
         }
       }
-      loadOpenSeaItems();
-      // await isTokenStaked();
-
+      await loadOpenSeaItems();
+      await updateIsTokenStaked();
+      await updateBalance();
     }
     main()
+    
+    const stakeFunction = async function() {
+      if (items.length > 0) {
+        console.log('stakeFunction called ' + items[0]?.token_id)
+
+        //const nft = new ethers.Contract(nftaddress, nftabi, signer)
+
+        console.log("Stake nft...")
+        //let priceInWei = await nft.getPrice();
+        //console.log("Price: " + priceInWei + " wei");
+        //await(await nft.mint({ value: priceInWei })).wait()
+        //await(await nft.mint(1)).wait()
+      }
+      else {
+        noTokenFound();
+      }
+    }
 	</script>
 
 	<div class="content-wrapper-mint3" style="background: black; min-height: 100vh;">
@@ -785,6 +813,9 @@
 										<button id="" class="point-close"><i class="fas fa-times"></i></button>
 										{# Mint integration #}
 										<h3 class="section__title ">MISSIONS</h3>
+										<p className="mt-5" style="color: gray;">
+											Token Balance: <span id="token-balance" style="fontSize: 20px;"></span>
+										</p>
 										<!--<p class="mt-5"><span id="items-count" style="fontSize: 20px;">Loading items...</span></p>-->
 										<p class="mt-5">
                       <div class="card bg-dark">
@@ -795,7 +826,7 @@
                           </div>
                           <div class="card-footer">
                             <div className='d-grid'>
-                                <button class="mint btn btn-secondary" onClick="stakeFunction()">
+                                <button id="button-stake" class="mint btn btn-secondary" onClick="stakeFunction()">
                                     Stake
                                 </button>
                             </div>
