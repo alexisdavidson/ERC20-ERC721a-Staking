@@ -1391,24 +1391,26 @@
           console.log("tokenIdsDecimal from Staker: ")
           console.log(tokenIdsDecimal)
 
-          let finalUrl = `${urlApi}/assets?asset_contract_address=${nftaddress}`
-        
-          for(i = 0; i < tokenIdsDecimal.length; i ++) {
-            finalUrl += "&token_ids=" + tokenIdsDecimal[i]
-          }
-          finalUrl += `&format=json`
-          console.log("Sending api call for items to " + finalUrl)
+          if(tokenIdsDecimal.length > 0) {
+            let finalUrl = `${urlApi}/assets?asset_contract_address=${nftaddress}`
           
-          items = await fetch(finalUrl)
-          .then((res) => res.json())
-          .then((res) => {
-            return res.assets
-          })
-          .catch((e) => {
-            console.error(e)
-            console.error('Could not talk to OpenSea')
-            return null
-          })
+            for(i = 0; i < tokenIdsDecimal.length; i ++) {
+              finalUrl += "&token_ids=" + tokenIdsDecimal[i]
+            }
+            finalUrl += `&format=json`
+            console.log("Sending api call for items to " + finalUrl)
+            
+            items = await fetch(finalUrl)
+            .then((res) => res.json())
+            .then((res) => {
+              return res.assets
+            })
+            .catch((e) => {
+              console.error(e)
+              console.error('Could not talk to OpenSea')
+              return null
+            })
+          }
         } catch(error) {
           console.log("nftstaker.stakes " + error)
         }
