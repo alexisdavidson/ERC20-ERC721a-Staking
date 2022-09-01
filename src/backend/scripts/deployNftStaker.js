@@ -7,8 +7,8 @@ async function main() {
 
   // Deploy contracts
   const NFTStaker = await ethers.getContractFactory("NFTStaker");
-  const nftStaker = await NFTStaker.deploy("0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"); // (localhost) nftAddress, rewardsTokenAddress)
-  // const nftStaker = await NFTStaker.deploy("0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9", "0x08edb028770140c2AC870C93F75DF94b5AD5157A"); // (rinkeby) nftAddress, rewardsTokenAddress)
+  // const nftStaker = await NFTStaker.deploy("0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"); // (localhost) nftAddress, rewardsTokenAddress)
+  const nftStaker = await NFTStaker.deploy("0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9", "0x08edb028770140c2AC870C93F75DF94b5AD5157A"); // (rinkeby) nftAddress, rewardsTokenAddress)
   
   console.log("NFTStaker contract address", nftStaker.address)
   

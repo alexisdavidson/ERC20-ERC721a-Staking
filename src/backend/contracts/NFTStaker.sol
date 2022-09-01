@@ -5,12 +5,12 @@ import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
-import "./Token.sol";
 
-contract NFTStaker is ERC721Holder, ReentrancyGuard {
+contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     ERC721A public parentNFT;
-    Token public rewardsToken;
+    ERC20 public rewardsToken;
 
     // Reward to be paid out per second
     uint256 public rewardRate;
@@ -23,13 +23,20 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard {
     // map staker address to stake details (stakes[address][tokenId] = timestamp)
     mapping(address => Staker) private stakers;
 
-    constructor(address nftAddress, address rewardsTokenAddress) {
+    constructor(address nftAddress) {
         parentNFT = ERC721A(nftAddress);
-        rewardsToken = Token(rewardsTokenAddress);
-        rewardsToken.claimInitialSupply();
+        // rewardsToken = ERC20(rewardsTokenAddress);
         
-        rewardRate = 5 * 10**uint(rewardsToken.decimals()) / 1 days; // 5 per day
+        rewardRate = 5 * 10**uint(18) / 1 days; // 5 per day
     }
+
+    function setTokenAddress(address _tokenAddress) external onlyOwner {
+        rewardsToken = ERC20(_tokenAddress);
+    }
+
+    // function claimTokenInitialSupply() external onlyOwner {
+    //     rewardsToken.claimInitialSupply();
+    // }
 
     function stake(uint256 _tokenId) public {
         stakers[msg.sender].tokenIds.push(_tokenId);

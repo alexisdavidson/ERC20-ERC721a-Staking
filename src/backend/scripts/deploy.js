@@ -17,19 +17,20 @@ async function main() {
   const NFT = await ethers.getContractFactory("NFT");
   const Token = await ethers.getContractFactory("Token");
   const NFTStaker = await ethers.getContractFactory("NFTStaker");
-  const nft = await NFT.deploy("0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]); // (localhost) Fill with correct input before deploy!
-  // const nft = await NFT.deploy("0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", ["0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", "0x1e85F8DAd89e993A2c290B846F48B62B151da8af"]); // (rinkeby) Fill with correct input before deploy!
-  const token = await Token.deploy();
-  // const nftStaker = await NFTStaker.deploy(nft.address, token.address);
-  
+  // const nft = await NFT.deploy("0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]); // (localhost) Fill with correct input before deploy!
+  const nft = await NFT.deploy("0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", ["0xCdb34512BD8123110D20852ebEF947275f7fD1Ce", "0x1e85F8DAd89e993A2c290B846F48B62B151da8af"]); // (rinkeby) Fill with correct input before deploy!
   console.log("NFT contract address", nft.address)
+  const nftStaker = await NFTStaker.deploy(nft.address);
+  console.log("NFTStaker contract address", nftStaker.address)
+  const token = await Token.deploy(nftStaker.address);
   console.log("Token contract address", token.address)
-  // console.log("NFTStaker contract address", nftStaker.address)
+  await nftStaker.setTokenAddress(token.address);
+  console.log("setTokenAddress")
   
   // For each contract, pass the deployed contract and name to this function to save a copy of the contract ABI and address to the front end.
   saveFrontendFiles(nft, "NFT");
   saveFrontendFiles(token, "Token");
-  // saveFrontendFiles(nftStaker, "NFTStaker");
+  saveFrontendFiles(nftStaker, "NFTStaker");
 }
 
 function saveFrontendFiles(contract, name) {

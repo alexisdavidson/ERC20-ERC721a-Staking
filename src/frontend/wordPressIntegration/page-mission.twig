@@ -771,10 +771,30 @@
     }
   ];
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 		const tokenabi = [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakerAddress",
+          "type": "address"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -897,13 +917,6 @@
     },
     {
       "inputs": [],
-      "name": "claimInitialSupply",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "decimals",
       "outputs": [
         {
@@ -961,19 +974,6 @@
         }
       ],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "initialSupplyClaimed",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1071,6 +1071,18 @@
   ]
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 		const nftstakerabi = [
     {
       "inputs": [
@@ -1078,15 +1090,48 @@
           "internalType": "address",
           "name": "nftAddress",
           "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "rewardsTokenAddress",
-          "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        }
+      ],
+      "name": "getStakedTokens",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "tokenIds",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -1143,6 +1188,19 @@
     },
     {
       "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "parentNFT",
       "outputs": [
         {
@@ -1152,6 +1210,13 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1172,12 +1237,25 @@
       "name": "rewardsToken",
       "outputs": [
         {
-          "internalType": "contract Token",
+          "internalType": "contract ERC20",
           "name": "",
           "type": "address"
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setTokenAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1197,24 +1275,13 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "newOwner",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
-      "name": "stakes",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1233,9 +1300,13 @@
   ]
 
 
-    const nftaddress = '0x9BA0538A6755b06E45B63e9d6f1CaB1d86555Cd9'; // todo: replace with correct address and abi
-    const tokenaddress = '0x08edb028770140c2AC870C93F75DF94b5AD5157A'; // todo: replace with correct address and abi
-    const nftstakeraddress = '0xD8CE97D86AB774B80Cb30fBa9acF8Dd47541f364'; // todo: replace with correct address and abi
+    const nftaddress = '0x1C7DF0A2e948187a0f7651B8825bC736cCa08Ee5'; // todo: replace with correct address and abi
+    const nftstakeraddress = '0x07acC067b3e16741fb4fCBBC693510a7D8fBF88D'; // todo: replace with correct address and abi
+    const tokenaddress = '0x2A8a099C2f5886678E7541D3D3cda195A2051A8a'; // todo: replace with correct address and abi
+    const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
+    // const urlApi = 'https://api.opensea.io/api/v1' // mainnet
+
+    const fromWei = (num) => ethers.utils.formatEther(num)
     let accounts = [];
     let provider = null;
     let signer = null;
@@ -1256,7 +1327,7 @@
         try {
           const balance = await token.balanceOf(accounts[0]);
           console.log("balance: " + balance);
-          $("#token-balance").text(balance);
+          $("#token-balance").text(fromWei(balance));
         }
         catch(error) {
           console.log("updateBalance " + error)
@@ -1284,8 +1355,6 @@
 
       const loadOpenSeaItems = async () => {
         console.log("loadOpenSeaItems...");
-        const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
-        // const urlApi = 'https://api.opensea.io/api/v1' // mainnet
         const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
         console.log("Sending api call for items to " + finalUrl)
 
@@ -1307,13 +1376,39 @@
       }
 
       const loadStakedItems = async () => {
-        const items = []
+        let items = []
         
         // map staker address to stake details (stakes[address][tokenId] = timestamp)
         //mapping(address => mapping(uint256 => uint256)) public stakes;
         
         try {
-          items = await nftstaker.stakes()
+          let tokenIds = await nftstaker.getStakedTokens(accounts[0])
+          let tokenIdsDecimal = []
+          for(i = 0; i < tokenIds.length; i ++) {
+             tokenIdsDecimal.push(tokenIds[i].toString())
+            console.log("FromWei: " + tokenIdsDecimal[i])
+          }
+          console.log("tokenIdsDecimal from Staker: ")
+          console.log(tokenIdsDecimal)
+
+          let finalUrl = `${urlApi}/assets?asset_contract_address=${nftaddress}`
+        
+          for(i = 0; i < tokenIdsDecimal.length; i ++) {
+            finalUrl += "&token_ids=" + tokenIdsDecimal[i]
+          }
+          finalUrl += `&format=json`
+          console.log("Sending api call for items to " + finalUrl)
+          
+          items = await fetch(finalUrl)
+          .then((res) => res.json())
+          .then((res) => {
+            return res.assets
+          })
+          .catch((e) => {
+            console.error(e)
+            console.error('Could not talk to OpenSea')
+            return null
+          })
         } catch(error) {
           console.log("nftstaker.stakes " + error)
         }
@@ -1326,6 +1421,7 @@
 
       const createCards = async () => {
         const stakedItems = await loadStakedItems();
+        await new Promise(r => setTimeout(r, 2000));
         let openSeaItems = await loadOpenSeaItems();
         // todo: Implement the logic that removes any element from openSeaItems that is in stakedItems
 
@@ -1393,7 +1489,7 @@
 											Token Balance: <span id="token-balance" style="fontSize: 20px;"></span>
 										</p>
 										<!--<p class="mt-5"><span id="items-count" style="fontSize: 20px;">Loading items...</span></p>-->
-										<p id="items-container" class="mt-5"></p>
+										<p id="items-container" class="mt-5">Loading ...</p>
 									</div>
 								</div>
 							</div>
