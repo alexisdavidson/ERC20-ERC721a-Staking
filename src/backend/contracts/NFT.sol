@@ -22,8 +22,12 @@ contract NFT is ERC721A, Ownable {
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     uint256 public price;
+    
+    event MintSuccessful(
+        address user
+    );
 
-    constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelato NFT", "GLN")
+    constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelatoverse Genesis", "GG")
     {
         // Set whitelist
         delete whitelistedAddresses;
@@ -59,6 +63,8 @@ contract NFT is ERC721A, Ownable {
         require(balanceOf(msg.sender) < amountMintPerAccount, 'Each address may only mint x NFTs!');
         require(msg.value >= getPrice(), "Not enough ETH sent; check price!");
         _mint(msg.sender, quantity);
+        
+        emit MintSuccessful(msg.sender);
     }
 
     function _baseURI() internal pure override returns (string memory) {
