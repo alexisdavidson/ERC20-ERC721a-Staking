@@ -27,6 +27,16 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     uint256 public rewardRate; // Reward to be paid out per second
     Mission currentMission;
     mapping(address => Staker) private stakers;
+    
+    event StakeSuccessful(
+        uint256 tokenId,
+        uint256 timestamp
+    );
+    
+    event UnstakeSuccessful(
+        uint256 tokenId,
+        uint256 reward
+    );
 
     constructor(address nftAddress) {
         parentNFT = ERC721A(nftAddress);
@@ -46,18 +56,14 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         return currentMission.startTimestamp > 0 && (block.timestamp - currentMission.startTimestamp < currentMission.duration);
     }
 
-    function maximumReward(uint256 _joinMissionTimestamp, Mission memory _mission) view internal returns(uint256){
-        uint256 _missionEndTimestamp = _mission.startTimestamp + _mission.duration;
-        uint256 _maximumduration = _missionEndTimestamp - _joinMissionTimestamp;
-        return _maximumduration * 60 * 60 * rewardRate;
-    }
-
     function stake(uint256 _tokenId) public {
         require(isMissionOngoing(), "There is no ongoing mission!");
         stakers[msg.sender].tokenIds.push(_tokenId);
         stakers[msg.sender].timestamps.push(block.timestamp);
         stakers[msg.sender].missions.push(currentMission);
         parentNFT.safeTransferFrom(msg.sender, address(this), _tokenId);
+
+        emit StakeSuccessful(_tokenId, block.timestamp);
     } 
 
     function unstake(uint256 _tokenId) public nonReentrant {
@@ -75,14 +81,17 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
             }
         }
 
+        // If the player unstakes later than the end of the mission, don't count the time after that
+        uint256 _missionEndTimestamp = _staker.missions[_tokenIndex].startTimestamp + _staker.missions[_tokenIndex].duration;
+        uint256 _leaveMissionTimestamp = block.timestamp > _missionEndTimestamp ? _missionEndTimestamp : block.timestamp;
         // Handout reward depending on the stakingTime
-        uint256 _stakingTime = block.timestamp - _staker.timestamps[_tokenIndex];
+        uint256 _stakingTime = _leaveMissionTimestamp - _staker.timestamps[_tokenIndex];
         uint256 _reward = _stakingTime * rewardRate;
-        uint256 _maximumRewardForMission = maximumReward(_staker.timestamps[_tokenIndex], _staker.missions[_tokenIndex]);
-        _reward = _reward > _maximumRewardForMission ? _maximumRewardForMission : _reward;
 
         rewardsToken.transfer(msg.sender, _reward);
         removeStakerElement(_tokenIndex, _tokensLength - 1);
+
+        emit UnstakeSuccessful(_tokenId, _reward);
     }
 
     function removeStakerElement(uint256 _tokenIndex, uint256 _lastIndex) internal {
