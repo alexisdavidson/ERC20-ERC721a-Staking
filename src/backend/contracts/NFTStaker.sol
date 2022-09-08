@@ -12,10 +12,11 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     ERC721A public parentNFT;
     ERC20 public rewardsToken;
 
+    // Staker must be structured this way because of the important function getStakedTokens() below that returns the tokenIds array directly.
     struct Staker { 
         uint256[] tokenIds;
         uint256[] timestamps;
-        uint256[] missionDurations;
+        Mission[] missions;
     }
 
     struct Mission {
@@ -45,15 +46,17 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         return currentMission.startTimestamp > 0 && (block.timestamp - currentMission.startTimestamp < currentMission.duration);
     }
 
-    function maximumReward(uint256 _duration) view internal returns(uint256){
-        return _duration * 60 * 60 * rewardRate;
+    function maximumReward(uint256 _joinMissionTimestamp, Mission memory _mission) view internal returns(uint256){
+        uint256 _missionEndTimestamp = _mission.startTimestamp + _mission.duration;
+        uint256 _maximumduration = _missionEndTimestamp - _joinMissionTimestamp;
+        return _maximumduration * 60 * 60 * rewardRate;
     }
 
     function stake(uint256 _tokenId) public {
         require(isMissionOngoing(), "There is no ongoing mission!");
         stakers[msg.sender].tokenIds.push(_tokenId);
         stakers[msg.sender].timestamps.push(block.timestamp);
-        stakers[msg.sender].missionDurations.push(currentMission.duration);
+        stakers[msg.sender].missions.push(currentMission);
         parentNFT.safeTransferFrom(msg.sender, address(this), _tokenId);
     } 
 
@@ -61,24 +64,25 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         // Unstake NFT from this smart contract
         parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
 
-        uint256 tokenIndex = 0;
+        Staker memory _staker = stakers[msg.sender];
+        uint256 _tokenIndex = 0;
         // Find token Index
-        uint256 tokensLength = stakers[msg.sender].tokenIds.length;
-        for(uint256 i = 0; i < tokensLength; i ++) {
-            if (stakers[msg.sender].tokenIds[i] == _tokenId) {
-                tokenIndex = i;
+        uint256 _tokensLength = _staker.tokenIds.length;
+        for(uint256 i = 0; i < _tokensLength; i ++) {
+            if (_staker.tokenIds[i] == _tokenId) {
+                _tokenIndex = i;
                 break;
             }
         }
 
         // Handout reward depending on the stakingTime
-        uint256 stakingTime = block.timestamp - stakers[msg.sender].timestamps[tokenIndex];
-        uint256 reward = stakingTime * rewardRate;
-        uint256 maximumRewardForMission = maximumReward(stakers[msg.sender].missionDurations[tokenIndex]);
-        reward = reward >= maximumRewardForMission ? maximumRewardForMission : reward;
+        uint256 _stakingTime = block.timestamp - _staker.timestamps[_tokenIndex];
+        uint256 _reward = _stakingTime * rewardRate;
+        uint256 _maximumRewardForMission = maximumReward(_staker.timestamps[_tokenIndex], _staker.missions[_tokenIndex]);
+        _reward = _reward > _maximumRewardForMission ? _maximumRewardForMission : _reward;
 
-        rewardsToken.transfer(msg.sender, reward);
-        removeStakerElement(tokenIndex, tokensLength - 1);
+        rewardsToken.transfer(msg.sender, _reward);
+        removeStakerElement(_tokenIndex, _tokensLength - 1);
     }
 
     function removeStakerElement(uint256 _tokenIndex, uint256 _lastIndex) internal {
@@ -88,13 +92,13 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         stakers[msg.sender].tokenIds[_tokenIndex] = stakers[msg.sender].tokenIds[_lastIndex];
         stakers[msg.sender].tokenIds.pop();
 
-        stakers[msg.sender].missionDurations[_tokenIndex] = stakers[msg.sender].missionDurations[_lastIndex];
-        stakers[msg.sender].missionDurations.pop();
+        stakers[msg.sender].missions[_tokenIndex] = stakers[msg.sender].missions[_lastIndex];
+        stakers[msg.sender].missions.pop();
     }
 
     function isTokenStaked(uint256 _tokenId) public view returns(bool) {
-        uint256 tokensLength = stakers[msg.sender].tokenIds.length;
-        for(uint256 i = 0; i < tokensLength; i ++) {
+        uint256 _tokensLength = stakers[msg.sender].tokenIds.length;
+        for(uint256 i = 0; i < _tokensLength; i ++) {
             if (stakers[msg.sender].tokenIds[i] == _tokenId) {
                 return true;
             }
