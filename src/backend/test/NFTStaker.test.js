@@ -7,7 +7,7 @@ const fromWei = (num) => Math.round(ethers.utils.formatEther(num))
 describe("NFTStaker", async function() {
     let deployer, addr1, addr2, nft, token, nftStaker, rewardRate
     let teamWallet = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
-    let whitelist = ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]
+    let whitelist = []
         
     let secondsInDay = 86400
     rewardRate = Math.floor(toWei(5) / secondsInDay).toString()
@@ -21,11 +21,13 @@ describe("NFTStaker", async function() {
 
         // Get signers
         [deployer, addr1, addr2] = await ethers.getSigners();
+        whitelist = [addr1.address, addr2.address]
 
         // Deploy contracts
         nft = await NFT.deploy(teamWallet, whitelist);
-        token = await Token.deploy();
-        nftStaker = await NFTStaker.deploy(nft.address, token.address);
+        nftStaker = await NFTStaker.deploy(nft.address);
+        token = await Token.deploy(nftStaker.address);
+        await nftStaker.setTokenAddress(token.address);
     });
 
     describe("Deployment", function() {

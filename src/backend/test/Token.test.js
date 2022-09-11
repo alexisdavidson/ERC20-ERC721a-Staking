@@ -6,7 +6,7 @@ const fromWei = (num) => ethers.utils.formatEther(num)
 describe("Token", async function() {
     let deployer, addr1, addr2, nft, token, nftStaker
     let teamWallet = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
-    let whitelist = ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]
+    let whitelist = []
 
     beforeEach(async function() {
         // Get contract factories
@@ -16,17 +16,19 @@ describe("Token", async function() {
 
         // Get signers
         [deployer, addr1, addr2] = await ethers.getSigners();
+        whitelist = [addr1.address, addr2.address]
 
         // Deploy contracts
         nft = await NFT.deploy(teamWallet, whitelist);
-        token = await Token.deploy();
-        nftStaker = await NFTStaker.deploy(nft.address, token.address);
+        nftStaker = await NFTStaker.deploy(nft.address);
+        token = await Token.deploy(nftStaker.address);
+        await nftStaker.setTokenAddress(token.address);
     });
 
     describe("Deployment", function() {
         it("Should track name and symbol of the token", async function() {
-            expect(await token.name()).to.equal("GelatoTokenName")
-            expect(await token.symbol()).to.equal("GelatoTokenSymbol")
+            expect(await token.name()).to.equal("Beach Coin")
+            expect(await token.symbol()).to.equal("BC")
         })
     })
 })

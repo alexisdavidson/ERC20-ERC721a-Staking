@@ -5,11 +5,10 @@ const fromWei = (num) => ethers.utils.formatEther(num)
 
 describe("NFT", async function() {
     let deployer, addr1, addr2, nft
-    let URI = "ipfs://QmNmBHVHMHt8kvT2VtPDjZ6sjGjyjJ5LBsr1DhnLvzTZss/"
+    let URI = "ipfs://Qmbx9io6LppmpvavX3EqZY8igQxPZh7koUzW3mPRLkLQir/"
     let UnkownURI = "unkownURI"
-    let hiddenURI = "ipfs://QmTfq5RWpX3k6dqbu2nGNc533YV1NhrB93imRh1WDnUhWB"
     let teamWallet = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
-    let whitelist = ["0x70997970c51812dc3a010c7d01b50e0d17dc79c8"]
+    let whitelist = []
 
     beforeEach(async function() {
         // Get contract factories
@@ -17,6 +16,7 @@ describe("NFT", async function() {
 
         // Get signers
         [deployer, addr1, addr2] = await ethers.getSigners();
+        whitelist = [addr1.address, addr2.address]
 
         // Deploy contracts
         nft = await NFT.deploy(teamWallet, whitelist);
@@ -24,8 +24,8 @@ describe("NFT", async function() {
 
     describe("Deployment", function() {
         it("Should track name and symbol of the nft collection", async function() {
-            expect(await nft.name()).to.equal("Gelato NFT")
-            expect(await nft.symbol()).to.equal("GLN")
+            expect(await nft.name()).to.equal("Gelatoverse Genesis")
+            expect(await nft.symbol()).to.equal("GG")
         })
 
         it("Should have 333 NFTs minted and belonging to the team wallet", async function() {
@@ -56,30 +56,15 @@ describe("NFT", async function() {
             await nft.connect(addr2).mint(3);
             expect(await nft.totalSupply()).to.equal(336);
             
-            //Unknown URIs
-            expect(await nft.tokenURI(0)).to.equal(hiddenURI);
-            expect(await nft.tokenURI(19)).to.equal(hiddenURI);
-            //Normal URIs
-            expect(await nft.tokenURI(20)).to.equal(hiddenURI);
-            expect(await nft.tokenURI(334)).to.equal(hiddenURI);
-        })
-
-        it("Should change URIs upon revealing", async function() {
-            await nft.connect(addr2).mint(3);
-            expect(await nft.totalSupply()).to.equal(336);
-
-            await nft.revealCollection();
-
-            //Unknown URIs
-            expect(await nft.tokenURI(0)).to.equal(UnkownURI);
-            expect(await nft.tokenURI(19)).to.equal(UnkownURI);
+            //Unknown URIs. When not revealed, it stays the base URI
+            expect(await nft.tokenURI(0)).to.equal(URI + "0.json");
+            expect(await nft.tokenURI(19)).to.equal(URI + "19.json");
             //Normal URIs
             expect(await nft.tokenURI(20)).to.equal(URI + "20.json");
             expect(await nft.tokenURI(334)).to.equal(URI + "334.json");
         })
 
         it("Should update Unkown URI", async function() {
-            await nft.revealCollection();
             await nft.revealUnkown(0, "UnkownUri0");
             expect(await nft.tokenURI(0)).to.equal("UnkownUri0");
             
