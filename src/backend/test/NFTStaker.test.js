@@ -26,17 +26,15 @@ describe("NFTStaker", async function() {
         // Deploy contracts
         nft = await NFT.deploy(teamWallet, whitelist);
         nftStaker = await NFTStaker.deploy(nft.address);
-        token = await Token.deploy(nftStaker.address);
+        token = await Token.deploy([nftStaker.address], [222000000]);
         await nftStaker.setTokenAddress(token.address);
     });
 
     describe("Deployment", function() {
-        it("Should the token initial claim on the staker contract", async function() {
+        it("Should mint tokens", async function() {
             // Nft Staker contract claims the initial supply
             expect(fromWei(await token.balanceOf(nftStaker.address))).to.equals(222000000);
             expect(fromWei(await token.totalSupply())).to.equals(222000000);
-            expect((await token.initialSupplyClaimed())).to.equals(true);
-            await expect((token.claimInitialSupply())).to.be.revertedWith('Initial supply has already been claimed');
             
             expect((await nftStaker.rewardRate()).toString()).to.equal(rewardRate);
         })
@@ -50,11 +48,12 @@ describe("NFTStaker", async function() {
             // Stake
             await nft.connect(addr1).setApprovalForAll(nftStaker.address, true);
 
+            await expect(nftStaker.connect(addr1).stake(333)).to.be.revertedWith('There is no ongoing mission!');
+
+            await nftStaker.startMission(24 * 15); // 15 Days mission
             await nftStaker.connect(addr1).stake(333);
             
-            const blockNumBefore = await ethers.provider.getBlockNumber();
-            const blockBefore = await ethers.provider.getBlock(blockNumBefore);
-            expect(await nftStaker.stakes(addr1.address, 333)).to.equals(blockBefore.timestamp);
+            expect((await nftStaker.getStakedTokens(addr1.address))[0]).to.equals(333);
 
             expect((await nft.ownerOf(333))).to.equals(nftStaker.address);
             expect((await token.balanceOf(addr1.address))).to.equals(0);
@@ -73,6 +72,40 @@ describe("NFTStaker", async function() {
 
             expect(fromWei(await token.balanceOf(addr1.address))).to.equals(fromWei((rewardRate * tenDays).toString()));
             expect(fromWei(await token.balanceOf(nftStaker.address))).to.equals(222000000 - fromWei((rewardRate * tenDays).toString()));
+        })
+
+        it("Should claim 10 days rewards for a 10 days mission and 20 days staking", async function() {
+            await nft.connect(addr1).mint(1);
+            expect((await nft.ownerOf(333))).to.equals(addr1.address);
+            
+            // Stake
+            await nft.connect(addr1).setApprovalForAll(nftStaker.address, true);
+
+            await expect(nftStaker.connect(addr1).stake(333)).to.be.revertedWith('There is no ongoing mission!');
+
+            const missionTime = 24 * 10; // 10 Days mission
+            await nftStaker.startMission(missionTime); 
+            await nftStaker.connect(addr1).stake(333);
+            
+            expect((await nftStaker.getStakedTokens(addr1.address))[0]).to.equals(333);
+
+            expect((await nft.ownerOf(333))).to.equals(nftStaker.address);
+            expect((await token.balanceOf(addr1.address))).to.equals(0);
+            expect(fromWei(await token.balanceOf(nftStaker.address))).to.equals(222000000);
+
+            // Unstake after 20 days
+            const twentyDays = 20 * 24 * 60 * 60 + 10;
+            await helpers.time.increase(twentyDays);
+
+            await nftStaker.connect(addr1).unstake(333);
+            expect((await nft.ownerOf(333))).to.equals(addr1.address);
+
+            // Expecting 50 units as reward
+            console.log("Expected Reward: " + fromWei((rewardRate * missionTime * 3600).toString()))
+            console.log("Staker actual new balance: " + fromWei(await token.balanceOf(addr1.address)))
+
+            expect(fromWei(await token.balanceOf(addr1.address))).to.equals(fromWei((rewardRate * missionTime * 3600).toString()));
+            expect(fromWei(await token.balanceOf(nftStaker.address))).to.equals(222000000 - fromWei((rewardRate * missionTime * 3600).toString()));
         })
     })
 })

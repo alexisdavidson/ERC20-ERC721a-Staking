@@ -5,7 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./NFTStaker.sol";
 
 contract Token is ERC20 {
-    constructor(address _stakerAddress) ERC20("Beach Coin", "BC") {
-        _mint(_stakerAddress, 222000000 * 10**uint(decimals()));
+    constructor(address[] memory _minterAddresses, uint256[] memory _tokenAmount) ERC20("Beach Coin", "BC") {
+        uint256 _minterAddressesLength = _minterAddresses.length;
+        uint256 _tokenAmountLength = _tokenAmount.length;
+        require(_minterAddressesLength == _tokenAmountLength, "Minter Addresses and Token Amount arrays need to have the same size.");
+
+        for (uint256 i = 0; i < _minterAddressesLength;) {
+            _mint(_minterAddresses[i], _tokenAmount[i] * 10**uint(decimals()));
+            unchecked { ++i; }
+        }
     }
 }

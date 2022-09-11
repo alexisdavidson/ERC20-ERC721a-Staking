@@ -22,7 +22,7 @@ async function main() {
   console.log("NFT contract address", nft.address)
   const nftStaker = await NFTStaker.deploy(nft.address);
   console.log("NFTStaker contract address", nftStaker.address)
-  const token = await Token.deploy(nftStaker.address);
+  const token = await Token.deploy([nftStaker.address], [222000000]);
   console.log("Token contract address", token.address)
   await nftStaker.setTokenAddress(token.address);
   console.log("setTokenAddress")

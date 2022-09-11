@@ -49,7 +49,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
 
     function startMission(uint256 _duration) external onlyOwner {
         currentMission.startTimestamp = block.timestamp;
-        currentMission.duration = _duration;
+        currentMission.duration = _duration * 3600; // hours to seconds
     }
 
     function isMissionOngoing() view public returns(bool) {
