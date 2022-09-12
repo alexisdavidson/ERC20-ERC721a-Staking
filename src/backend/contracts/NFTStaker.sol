@@ -57,7 +57,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         return currentMission.startTimestamp > 0 && (block.timestamp - currentMission.startTimestamp < currentMission.duration);
     }
 
-    function stake(uint256 _tokenId) public {
+    function stake(uint256 _tokenId) public nonReentrant {
         require(isMissionOngoing(), "There is no ongoing mission!");
         stakers[msg.sender].tokenIds.push(_tokenId);
         stakers[msg.sender].timestamps.push(block.timestamp);
@@ -68,9 +68,6 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     } 
 
     function unstake(uint256 _tokenId) public nonReentrant {
-        // Unstake NFT from this smart contract
-        parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
-
         Staker memory _staker = stakers[msg.sender];
         uint256 _tokenIndex = 0;
         // Find token Index
@@ -89,10 +86,14 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 _stakingTime = _leaveMissionTimestamp - _staker.timestamps[_tokenIndex];
         uint256 _reward = _stakingTime * rewardRate;
 
-        rewardsToken.transfer(msg.sender, _reward);
-        removeStakerElement(_tokenIndex, _tokensLength - 1);
+        if (rewardsToken.transfer(msg.sender, _reward) == true) {
+            // Unstake NFT from this smart contract
+            parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
+            removeStakerElement(_tokenIndex, _tokensLength - 1);
 
-        emit UnstakeSuccessful(_tokenId, _reward);
+            emit UnstakeSuccessful(_tokenId, _reward);
+        }
+        else revert();
     }
 
     function removeStakerElement(uint256 _tokenIndex, uint256 _lastIndex) internal {
