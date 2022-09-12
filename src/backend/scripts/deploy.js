@@ -26,7 +26,7 @@ async function main() {
   console.log("NFTStaker contract address", nftStaker.address)
   const token = await Token.deploy([nftStaker.address, teamWallet], [73000000, 149000000]);
   console.log("Token contract address", token.address)
-  await nftStaker.setTokenAddress(token.address);
+  await nftStaker.setOwnerAndTokenAddress(teamWallet, token.address);
   console.log("setTokenAddress")
   
   // For each contract, pass the deployed contract and name to this function to save a copy of the contract ABI and address to the front end.

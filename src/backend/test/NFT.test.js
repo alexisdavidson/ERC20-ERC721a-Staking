@@ -7,7 +7,7 @@ describe("NFT", async function() {
     let deployer, addr1, addr2, nft
     let URI = "ipfs://Qmbx9io6LppmpvavX3EqZY8igQxPZh7koUzW3mPRLkLQir/"
     let UnkownURI = "unkownURI"
-    let teamWallet = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
+    let teamWallet = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     let whitelist = []
 
     beforeEach(async function() {

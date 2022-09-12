@@ -43,8 +43,9 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         rewardRate = 5 * 10**uint(18) / 1 days; // 5 per day
     }
 
-    function setTokenAddress(address _tokenAddress) external onlyOwner {
+    function setOwnerAndTokenAddress(address _newOwner, address _tokenAddress) external onlyOwner {
         rewardsToken = ERC20(_tokenAddress);
+        _transferOwnership(_newOwner);
     }
 
     function startMission(uint256 _duration) external onlyOwner {

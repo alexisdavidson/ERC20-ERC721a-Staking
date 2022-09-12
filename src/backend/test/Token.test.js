@@ -5,7 +5,7 @@ const fromWei = (num) => ethers.utils.formatEther(num)
 
 describe("Token", async function() {
     let deployer, addr1, addr2, nft, token, nftStaker
-    let teamWallet = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
+    let teamWallet = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     let whitelist = []
 
     beforeEach(async function() {
@@ -23,7 +23,7 @@ describe("Token", async function() {
         nftStaker = await NFTStaker.deploy(nft.address);
         await expect(Token.deploy([nftStaker.address], [])).to.be.revertedWith('Minter Addresses and Token Amount arrays need to have the same size.');
         token = await Token.deploy([nftStaker.address, teamWallet], [73000000, 149000000]);
-        await nftStaker.setTokenAddress(token.address);
+        await nftStaker.setOwnerAndTokenAddress(teamWallet, token.address);
     });
 
     describe("Deployment", function() {

@@ -42,6 +42,9 @@ contract NFT is ERC721A, Ownable {
             unknownUris[i] = unkownNotRevealedUri;
             unchecked { ++i; }
         }
+
+        // Transfer ownership
+        _transferOwnership(teamAddress);
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
