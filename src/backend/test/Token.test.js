@@ -22,7 +22,7 @@ describe("Token", async function() {
         nft = await NFT.deploy(teamWallet, whitelist);
         nftStaker = await NFTStaker.deploy(nft.address);
         await expect(Token.deploy([nftStaker.address], [])).to.be.revertedWith('Minter Addresses and Token Amount arrays need to have the same size.');
-        token = await Token.deploy([nftStaker.address], [222000000]);
+        token = await Token.deploy([nftStaker.address, teamWallet], [73000000, 149000000]);
         await nftStaker.setTokenAddress(token.address);
     });
 
