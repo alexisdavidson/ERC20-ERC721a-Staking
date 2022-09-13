@@ -177,6 +177,19 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "MintSuccessful",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "previousOwner",
@@ -768,9 +781,16 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ];
-        const nftaddress = '0x1C7DF0A2e948187a0f7651B8825bC736cCa08Ee5'; // todo: replace with correct address and abi
+        const nftaddress = '0xa3c5ee82eFE01EbE68f574CB2699B5239692c4CD'; // todo: replace with correct address and abi
 		const mintFunction = async function() {
 			console.log('mintFunction called')
 

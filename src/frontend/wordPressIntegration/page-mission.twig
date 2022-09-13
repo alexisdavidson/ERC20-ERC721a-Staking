@@ -177,6 +177,19 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "MintSuccessful",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "previousOwner",
@@ -768,6 +781,13 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ];
 
@@ -790,9 +810,14 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_stakerAddress",
-          "type": "address"
+          "internalType": "address[]",
+          "name": "_minterAddresses",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_tokenAmount",
+          "type": "uint256[]"
         }
       ],
       "stateMutability": "nonpayable",
@@ -1115,6 +1140,44 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeSuccessful",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "reward",
+          "type": "uint256"
+        }
+      ],
+      "name": "UnstakeSuccessful",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -1128,6 +1191,19 @@
           "internalType": "uint256[]",
           "name": "tokenIds",
           "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isMissionOngoing",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -1249,11 +1325,16 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "_newOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
           "name": "_tokenAddress",
           "type": "address"
         }
       ],
-      "name": "setTokenAddress",
+      "name": "setOwnerAndTokenAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1267,6 +1348,19 @@
         }
       ],
       "name": "stake",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_duration",
+          "type": "uint256"
+        }
+      ],
+      "name": "startMission",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1300,9 +1394,9 @@
   ]
 
 
-    const nftaddress = '0x1C7DF0A2e948187a0f7651B8825bC736cCa08Ee5'; // todo: replace with correct address and abi
-    const nftstakeraddress = '0x07acC067b3e16741fb4fCBBC693510a7D8fBF88D'; // todo: replace with correct address and abi
-    const tokenaddress = '0x2A8a099C2f5886678E7541D3D3cda195A2051A8a'; // todo: replace with correct address and abi
+    const nftaddress = '0xa3c5ee82eFE01EbE68f574CB2699B5239692c4CD'; // todo: replace with correct address and abi
+    const nftstakeraddress = '0x9fb673439211E83dC273226B08Ac66e84c6DAb34'; // todo: replace with correct address and abi
+    const tokenaddress = '0x15F0F6846A9d34e6C3554C87c61b24B1F81c6Ee8'; // todo: replace with correct address and abi
     const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
     // const urlApi = 'https://api.opensea.io/api/v1' // mainnet
 
