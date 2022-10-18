@@ -27,7 +27,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
     bytes32 keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15; // goerli - Change this depending current blockchain!
     uint32 callbackGasLimit = 200000;
     uint16 requestConfirmations = 3;
-    uint32 numWords =  2;
+    uint32 numWords =  1;
     uint256[] public s_randomWords;
     uint256 public s_requestId;
 
@@ -247,7 +247,6 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
     }
 
     function FightRandom(uint256 _randomNumber, uint256 _uid) internal {
-
         uint256 _rand = _randomNumber%13;
 
         if (_rand == 0){
@@ -379,13 +378,6 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
         price = (address(this).balance) / _totalSupplies._value;
         count = Characters[_uid].stash;
         value = count*price; 
-    }
-
-
-    //Random **************************************************************
-
-    function GetGameRandXXL() public view returns(uint256 _rand) { 
-        _rand = uint256(uint256(keccak256(abi.encodePacked(block.number, block.coinbase, msg.sender,address(this).balance ))));
     }
 
     function DebugCall(uint256 _uid) private {
