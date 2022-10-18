@@ -392,7 +392,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
 
     //VRF Chainlink **************************************************************
     // Request random number from Chainlink
-    function requestRandomNumber(RandomNumberRequest memory _randomNumberRequest) public {
+    function requestRandomNumber(RandomNumberRequest memory _randomNumberRequest) private {
         requestRandomNumber();
         randomNumberRequestsQueue.push(_randomNumberRequest);
     }
