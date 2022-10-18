@@ -27,7 +27,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
     bytes32 keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15; // goerli - Change this depending current blockchain!
     uint32 callbackGasLimit = 200000;
     uint16 requestConfirmations = 3;
-    uint32 numWords =  1;
+    uint32 numWords =  2;
     uint256[] public s_randomWords;
     uint256 public s_requestId;
 
@@ -88,6 +88,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
 
     //AUDITOR 
 	//Forbidden() is several common requires() that should revert. Is this more risky than having all requires inline?
+    //AUDITOR COMMENT: It is not more risky, this is totally fine
 
     function GameReload(uint256 _uid, uint256 _amount) public payable nonReentrant(){
         forbidden(_uid);
@@ -114,6 +115,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
 
     //AUDITOR 
 	//You mentioned something about "locking" funds in previous version comments?
+    //AUDITOR COMMENT: Actually got cleared out. Forgot to remove the comment, my bad! No problem here.
 
     function GameRedeem(uint256 _uid, uint256 _amount) public nonReentrant() {
         forbidden(_uid);
@@ -125,7 +127,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
         requestRandomNumber(RandomNumberRequest(msg.sender, 0, _uid, _amount));
     }
 
-    function RedeemRandom(uint256 _randomNumber, uint256 _uid, uint256 _amount) internal {
+    function RedeemRandom(uint256 _randomNumber, uint256 _uid, uint256 _amount) private {
         //Remove shares from Characters[_uid].stash, decrease total supply of shares. 
         //If randNoMod is zero (1 in a trillion chance), shares destroyed without value refund else give value of shares to _uid owner
         uint256 price = (address(this).balance) / _totalSupplies._value;
@@ -170,6 +172,8 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
 	//AUDITOR 
 	//Is sending the win/loss through secondary function an issue?
 	//Frontrunning a losing transaction? Miner manipulation?
+    //AUDITOR COMMENT: Since these functions are set to private, this is not a problem.
+    //There is no way to know that the transaction is losing before the state of the blockchain has been updated
     
     
     //AUDITOR 
@@ -177,6 +181,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
     //If x == y || x is sequential to y the player loses 10% and the Exploration is finished
     //If x == 0 || y == 0 player loses entire bet.
     //Else x-y is the target range for fight function.
+    //AUDITOR COMMENT: Looks good
 
     function GameExplore(uint256 _uid, uint256 _amount) public {
         forbidden(_uid);
@@ -191,13 +196,13 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
         requestRandomNumber(RandomNumberRequest(msg.sender, 1, _uid, _amount));
     }
     
-    function ExploreRandom(uint256 _randomNumber, uint256 _uid, uint256 _amount) internal {
+    function ExploreRandom(uint256 _randomNumber1, uint256 _randomNumber2, uint256 _uid, uint256 _amount) private {
         Characters[_uid].stash -= _amount;
         Characters[_uid].backpack += _amount;
         
-        uint256 _rand = _randomNumber;
+        uint256 _rand = _randomNumber1;
         Characters[_uid].targetX = _rand % 13;
-        _rand = uint256(keccak256(abi.encodePacked(msg.sender, _rand)));
+        _rand = _randomNumber2;
         Characters[_uid].targetY = _rand % 13;
 
         if (Characters[_uid].targetX == 0 || Characters[_uid].targetY == 0){
@@ -236,6 +241,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
     //If the result is outside target range player loses 50%
     //If result is equal to X or Y player loses 100%
     //If result is equal to 0 player wins double the total risked
+    //AUDITOR COMMENT: Looks good
 
     function GameFight(uint256 _uid) public {
         forbidden(_uid);
@@ -246,7 +252,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
         requestRandomNumber(RandomNumberRequest(msg.sender, 2, _uid, 0));
     }
 
-    function FightRandom(uint256 _randomNumber, uint256 _uid) internal {
+    function FightRandom(uint256 _randomNumber, uint256 _uid) private {
         uint256 _rand = _randomNumber%13;
 
         if (_rand == 0){
@@ -418,7 +424,7 @@ contract NewTokenExample is ERC721, Ownable, ReentrancyGuard, VRFConsumerBaseV2 
             RedeemRandom(s_randomWords[0], lastRandomNumberRequest.param1, lastRandomNumberRequest.param2);
         }
         else if (lastRandomNumberRequest.callbackFunction == 1) { // Explore
-            ExploreRandom(s_randomWords[0], lastRandomNumberRequest.param1, lastRandomNumberRequest.param2);
+            ExploreRandom(s_randomWords[0], s_randomWords[1], lastRandomNumberRequest.param1, lastRandomNumberRequest.param2);
         }
         else if (lastRandomNumberRequest.callbackFunction == 2) { // Fight
             FightRandom(s_randomWords[0], lastRandomNumberRequest.param1);
