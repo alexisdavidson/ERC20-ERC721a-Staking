@@ -1410,6 +1410,7 @@
     let token = null;
     let nftstaker = null;
     let nft = null;
+    let isMissionOngoing = false;
 
     
     const main = async function() {
@@ -1434,21 +1435,43 @@
         }
       }
 
+      const updateIsMissionOngoing = async function() {
+        console.log("updateIsMissionOngoing...");
+        try {
+          isMissionOngoing = await nftstaker.isMissionOngoing();
+          console.log("isMissionOngoing: " + isMissionOngoing);
+        }
+        catch(error) {
+          console.log("updateIsMissionOngoing " + error)
+        }
+      }
+
       const createCardHtml = async (token_id, name, image, isStaked) => {
-        const stakeUnstakeText = isStaked ? "Unstake" : "Stake"
-        let cardHtml = `<div class="card bg-dark mx-1 my-3">
-                          <img class="card-img-top" src="${image}"/>
-                          <div class="card-body">
-                            <div class="card-title">${name}</div>
-                          </div>
-                          <div class="card-footer">
-                            <div class='d-grid'>
-                                <button class="mint btn btn-secondary" onClick="stakeUnstakeFunction(${token_id}, ${isStaked})">
-                                    ${stakeUnstakeText}
-                                </button>
+        const stakeUnstakeText = isStaked ? "Unstake" : "Start Mission"
+        const button = isMissionOngoing ? 
+          `<button class="mint btn btn-secondary" style="margin: 0;"
+              onClick="stakeUnstakeFunction(${token_id}, ${isStaked})">
+                ${stakeUnstakeText}
+            </button>` 
+        : 
+          `<button class="mint btn btn-secondary" style="margin: 0; background-color: gray;">
+              ${stakeUnstakeText}
+            </button>` 
+          
+        let cardHtml = `<div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <div class="section__box">
+                                <div class="featured-image">
+                                    <img class="img-fluid d-block"
+                                          src="${image}"
+                                          alt=""/>
+                                </div>
+                                <p class="section__lead">${name}</p>
+                                <p class="section__cta">
+                                  ${button}
+                                </p>
+
                             </div>
-                          </div>
-                      </div>`
+                        </div>`
         return cardHtml
       }
 
@@ -1532,7 +1555,7 @@
           for(i = 0; i < openSeaItems.length; i ++)
             cardsHtml += await createCardHtml(openSeaItems[i].token_id, openSeaItems[i].name, openSeaItems[i].image_url, false)
         } else {
-          cardsHtml += "<p>You need at least 1 Gelato NFT at disposition to start new missions!</p>"
+          cardsHtml += "<p>You don’t have any Gelato to send on a mission! Buy more coward!</p>"
         }
         
         if (stakedItems != null && stakedItems.length > 0) {
@@ -1545,10 +1568,32 @@
         document.getElementById("items-container").innerHTML = cardsHtml
       }
 
-    //   await createCards();
       await updateBalance();
+      await updateIsMissionOngoing();
+      await createCards();
     }
     main()
+    
+    const stakeUnstakeFunction = async function(token_id, isStaked) {
+      console.log('stakeUnstakeFunction called ' + token_id)
+      try {
+        if (!isStaked) {
+          console.log("isApprovedForAll " + accounts[0] + " " + nftstakeraddress);
+          if ((await nft.isApprovedForAll(accounts[0], nftstakeraddress)) != true) {
+            console.log("Set approval for all");
+            await(await nft.setApprovalForAll(nftstakeraddress, true)).wait()
+          }
+          console.log("Stake nft...")
+          await nftstaker.stake(token_id)
+        } else {
+          console.log("Unstake nft...")
+          await nftstaker.unstake(token_id)
+        }
+      } catch (error) {
+        console.error("Custom error handling: " + error);
+        document.getElementById("items-container").innerHTML = error
+      }
+    }
 </script>
 
 <div class="section section--tabs hide" id="tabs">
@@ -1587,8 +1632,9 @@
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="nav-recruitment" role="tabpanel"
                              aria-labelledby="nav-recruitment-tab">
-                            <div class="row align-items-center h-100">
-                                {% for i in 0..3 %}
+                            <div class="row align-items-center h-100" id="items-container">
+                              Loading ...
+                                {# {% for i in 0..3 %}
                                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                                         <div class="section__box">
                                             <div class="featured-image">
@@ -1603,7 +1649,7 @@
 
                                         </div>
                                     </div>
-                                {% endfor %}
+                                {% endfor %} #}
 
                             </div>
                         </div>
