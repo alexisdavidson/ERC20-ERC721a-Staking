@@ -1,0 +1,179 @@
+<div class="section section--tabs hide" id="tabs">
+    <div class="container h-100">
+        <div class="section__inner">
+            <div class="row align-items-center h-100">
+                <div class="col-12">
+                    <div class="section__close">
+                        <button id="" class="point-close"><i class="fas fa-times"></i></button>
+                    </div>
+                    <h3 class="section__title">Missions</h3>
+                    <p class="lead"></p>
+                </div>
+            </div>
+            <div class="row align-items-center h-100">
+                <div class="col-12">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-recruitment-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-recruitment" type="button" role="tab"
+                                    aria-controls="nav-recruitment" aria-selected="true">Recruitment
+                            </button>
+                            <button class="nav-link" id="nav-hq-tab" data-bs-toggle="tab" data-bs-target="#nav-hq"
+                                    type="button" role="tab" aria-controls="nav-hq" aria-selected="false">HQ
+                            </button>
+                            <button class="nav-link" id="nav-mission-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-mission" type="button" role="tab" aria-controls="nav-mission"
+                                    aria-selected="false">Mission
+                            </button>
+                            <button class="nav-link" id="nav-rewards-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-rewards" type="button" role="tab" aria-controls="nav-rewards"
+                                    aria-selected="false">Rewards
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-recruitment" role="tabpanel"
+                             aria-labelledby="nav-recruitment-tab">
+                            <div class="row align-items-center h-100">
+                                {% for i in 0..3 %}
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                        <div class="section__box">
+                                            <div class="featured-image">
+                                                <img class="img-fluid d-block"
+                                                     src="https://gelatoversenft.com/wp-content/uploads/2021/12/Mango-1080x1080-c-default.png"
+                                                     alt=""/>
+                                            </div>
+                                            <p class="section__lead"><span>Gelato</span>#9941</p>
+                                            <p class="section__cta"><a href="/" target=""
+                                                                       class="btn btn-secondary">Start Mission</a>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-hq" role="tabpanel" aria-labelledby="nav-hq-tab">
+                            <div class="row align-items-center h-100">
+                                <div class="col-12">
+                                    <p class="section__lead">Here you can see your inactive but recruited gelatos. Send
+                                        them home to trade them or send them all on a new mission. </p>
+                                </div>
+                            </div>
+                            <div class="row align-items-center h-100">
+                                {% for i in 0..3 %}
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                        <div class="section__box">
+                                            <div class="featured-image">
+                                                <img class="img-fluid d-block"
+                                                     src="https://gelatoversenft.com/wp-content/uploads/2021/12/Mango-1080x1080-c-default.png"
+                                                     alt=""/>
+                                            </div>
+                                            <p class="section__lead"><span>Gelato</span>#9941</p>
+                                            <p class="section__cta"><a href="/" target=""
+                                                                       class="btn btn-secondary">Send Home</a>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="row align-items-center h-100">
+                                <div class="col-12">
+                                    <p class="section__cta"><a href="/" target=""
+                                                               class="btn btn-secondary">Start Mission</a>
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+                            <div class="row align-items-center h-100">
+                                <div class="col-12">
+                                    <p class="section__lead">Here you can see your heroes who are actively participating
+                                        in a mission! </p>
+                                </div>
+                            </div>
+                            <div class="row align-items-center h-100">
+                                {% for i in 0..3 %}
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                        <div class="section__box">
+                                            <div class="featured-image">
+                                                <img class="img-fluid d-block"
+                                                     src="https://gelatoversenft.com/wp-content/uploads/2021/12/Mango-1080x1080-c-default.png"
+                                                     alt=""/>
+                                            </div>
+                                            <p class="section__lead"><span>Gelato</span>#9941</p>
+                                            <p class="section__cta"><a href="/" target=""
+                                                                       class="btn btn-secondary">Send Home</a>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-rewards" role="tabpanel" aria-labelledby="nav-rewards-tab">
+
+                            <div class="row align-items-center h-100">
+                                <div class="col-3 col-lg-1 offset-0 offset-lg-2">
+                                    <div class="featured-image">
+                                        <img class="img-fluid d-block"
+                                             src="/wp-content/themes/Gelatoversenft-theme/dist/img/Gelatoverse_Beach_Coin.png"
+                                             alt=""/>
+                                    </div>
+                                </div>
+                                <div class="col-9 col-lg-6">
+                                    <div class="section__box"><p class="lead">Rewards from Active Mission</p>
+                                        <span>700</span></div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center h-100">
+                                <div class="col-3 col-lg-1 offset-0 offset-lg-2">
+                                    <div class="featured-image">
+                                        <img class="img-fluid d-block"
+                                             src="/wp-content/themes/Gelatoversenft-theme/dist/img/Gelatoverse_Beach_Coin.png"
+                                             alt=""/>
+                                    </div>
+                                </div>
+
+                                <div class="col-9 col-lg-6">
+                                    <div class="section__box"><p class="lead">Unclaimed Beach Coin</p><span>1200</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center h-100">
+                                <div class="col-3 col-lg-1 offset-0 offset-lg-2">
+                                    <div class="featured-image">
+                                        <img class="img-fluid d-block"
+                                             src="/wp-content/themes/Gelatoversenft-theme/dist/img/Gelatoverse_Beach_Coin.png"
+                                             alt=""/>
+                                    </div>
+                                </div>
+
+                                <div class="col-9 col-lg-6">
+                                    <div class="section__box"><p class="lead">Claimed Beach Coin</p><span>700</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center h-100">
+                                <div class="col-12">
+                                    <p class="section__cta"><a href="/" target=""
+                                                               class="btn btn-secondary">Claim All</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</div>
+</div>

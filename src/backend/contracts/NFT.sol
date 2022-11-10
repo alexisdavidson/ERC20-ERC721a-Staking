@@ -5,13 +5,14 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "erc721a/contracts/ERC721A.sol";
+import {DefaultOperatorFilterer} from "../DefaultOperatorFilterer.sol";
 
-contract NFT is ERC721A, Ownable {
+contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     string public constant uriSuffix = '.json';
 
     uint256 public immutable max_supply = 9941;
 
-    uint public amountMintPerAccount = 1;
+    uint public amountMintPerAccount = 10;
 
     bool public whitelistEnabled = true;
     address[] private whitelistedAddresses;
