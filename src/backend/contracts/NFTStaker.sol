@@ -17,6 +17,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256[] tokenIds;
         uint256[] timestamps;
         Mission[] missions;
+        uint256 tokensToClaim;
     }
 
     struct Mission {
@@ -96,12 +97,21 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 _stakingTime = _leaveMissionTimestamp - _staker.timestamps[_tokenIndex];
         uint256 _reward = _stakingTime * rewardRate;
 
-        if (rewardsToken.transfer(msg.sender, _reward) == true) {
-            // Unstake NFT from this smart contract
-            parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
-            removeStakerElement(_tokenIndex, _tokensLength - 1);
+        // Unstake NFT from this smart contract
+        parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
+        removeStakerElement(_tokenIndex, _tokensLength - 1);
 
-            emit UnstakeSuccessful(_tokenId, _reward);
+        stakers[msg.sender].tokensToClaim += _reward;
+
+        emit UnstakeSuccessful(_tokenId, _reward);
+    }
+
+    function claimReward() external {
+        uint256 _reward = stakers[msg.sender].tokensToClaim;
+        require(_reward > 0, "No tokens to claim");
+
+        if (rewardsToken.transfer(msg.sender, _reward) == true) {
+            stakers[msg.sender].tokensToClaim = 0;
         }
         else revert();
     }
@@ -139,7 +149,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         return stakers[_user].missions;
     }
     
-    // function getStakedMissionDurations(address _user) public view returns (uint256[] memory durations) {
-    //     return stakers[_user].missions.duration;
-    // }
+    function getRewardToClaim(address _user) public view returns (uint256) {
+        return stakers[_user].tokensToClaim;
+    }
 }

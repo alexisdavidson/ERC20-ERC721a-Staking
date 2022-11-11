@@ -1463,6 +1463,7 @@
     let tokenIdsToStakeBatch = []
     let rewardRate = 1
     let sumRewards = 0
+    let tokensToClaim = 0
 
     
     const main = async function() {
@@ -1492,8 +1493,11 @@
         try {
           isMissionOngoing = await nftstaker.isMissionOngoing();
           rewardRate = await nftstaker.rewardRate();
+          tokensToClaim = await nftstaker.getRewardToClaim(account[0]);
           console.log("isMissionOngoing: " + isMissionOngoing);
           console.log("rewardRate: " + rewardRate);
+          console.log("tokensToClaim: " + tokensToClaim);
+          $("#token-unclaimed").text(fromWei(tokensToClaim));
         }
         catch(error) {
           console.log("updateIsMissionOngoing " + error)
@@ -1689,6 +1693,15 @@
     }
     main()
     
+    const claimReward = async () => {
+      console.log(claimReward)
+      try {
+        await nftstaker.claimReward()
+      } catch (error) {
+        console.error("Custom error handling: " + error);
+      }
+    }
+
     const stakeUnstakeFunction = async function(token_id, isStaked) {
       console.log('stakeUnstakeFunction called ' + token_id)
       try {
@@ -1871,7 +1884,7 @@
                                 </div>
 
                                 <div class="col-9 col-lg-6">
-                                    <div class="section__box"><p class="lead">Unclaimed Beach Coin</p><span>1200</span>
+                                    <div class="section__box"><p class="lead">Unclaimed Beach Coin</p><span id="token-unclaimed">1200</span>
                                     </div>
                                 </div>
                             </div>
@@ -1892,8 +1905,10 @@
 
                             <div class="row align-items-center h-100">
                                 <div class="col-12">
-                                    <p class="section__cta"><a href="/" target=""
-                                                               class="btn btn-secondary">Claim All</a>
+                                    <p class="section__cta">
+                                      <button class="mint btn btn-secondary" onClick="claimReward()">
+                                            Claim All
+                                      </button>
                                     </p>
                                 </div>
                             </div>
