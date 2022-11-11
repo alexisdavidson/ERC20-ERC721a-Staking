@@ -5,9 +5,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "erc721a/contracts/ERC721A.sol";
-import {DefaultOperatorFilterer} from "../DefaultOperatorFilterer.sol";
+// import {DefaultOperatorFilterer} from "../DefaultOperatorFilterer.sol";
 
-contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
+contract NFT is ERC721A, Ownable {
     string public constant uriSuffix = '.json';
 
     uint256 public immutable max_supply = 9941;
