@@ -65,7 +65,17 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         parentNFT.safeTransferFrom(msg.sender, address(this), _tokenId);
 
         emit StakeSuccessful(_tokenId, block.timestamp);
-    } 
+    }
+
+    function stakeBatch(uint256[] memory _tokenIds) public nonReentrant {
+        require(isMissionOngoing(), "There is no ongoing mission!");
+        
+        uint256 _tokensIdsLength = _tokenIds.length;
+        for (uint256 i = 0; i < _tokensIdsLength;) {
+            stake(_tokenIds[i]);
+            unchecked { ++i; }
+        }
+    }
 
     function unstake(uint256 _tokenId) public nonReentrant {
         Staker memory _staker = stakers[msg.sender];

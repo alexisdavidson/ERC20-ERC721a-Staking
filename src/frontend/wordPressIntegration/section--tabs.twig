@@ -1460,6 +1460,7 @@
     let nftstaker = null;
     let nft = null;
     let isMissionOngoing = false;
+    let tokenIdsToStakeBatch = []
 
     
     const main = async function() {
@@ -1496,7 +1497,7 @@
       }
 
       const createCardHtml = async (token_id, name, image, isStaked) => {
-        const stakeUnstakeText = isStaked ? "Unstake" : "Start Mission"
+        const stakeUnstakeText = isStaked ? "Send home" : "Start Mission"
         const button = isMissionOngoing ? 
           `<button class="mint btn btn-secondary" style="margin: 0;"
               onClick="stakeUnstakeFunction(${token_id}, ${isStaked})">
@@ -1637,11 +1638,14 @@
       const createHqCards = async (stakedItems, currentTimestamp) => {
         let cardsHtml = ""
         
+        tokenIdsToStakeBatch = []
         if (stakedItems != null && stakedItems.length > 0) {
           for(i = 0; i < stakedItems.length; i ++) {
             const isMissionOngoing = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.startTimestamp
-            if (!isMissionOngoing)
+            if (!isMissionOngoing) {
+              tokenIdsToStakeBatch.push(stakedItems[i].token_id)
               cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
+            }
           }
         } else {
           cardsHtml += "<p>You currently don't have a Gelato NFT in a mission.</p>"
@@ -1691,6 +1695,20 @@
       } catch (error) {
         console.error("Custom error handling: " + error);
         document.getElementById("items-container-opensea").innerHTML = error
+      }
+    }
+
+    const stakeBatch = async () => {
+      console.log("stakeBatch")
+      console.log(tokenIdsToStakeBatch)
+
+      try {
+        if (tokenIdsToStakeBatch.length > 0) {
+          await nftstaker.stakeBatch(tokenIdsToStakeBatch)
+        }
+      } catch (error) {
+        console.error("Custom error handling: " + error);
+        document.getElementById("items-container-hq").innerHTML = error
       }
     }
 </script>
@@ -1780,8 +1798,10 @@
                             </div>
                             <div class="row align-items-center h-100">
                                 <div class="col-12">
-                                    <p class="section__cta"><a href="/" target=""
-                                                               class="btn btn-secondary">Start Mission</a>
+                                    <p class="section__cta">
+                                      <button class="mint btn btn-secondary" onClick="stakeBatch()">
+                                            Start Mission
+                                      </button>
                                     </p>
                                 </div>
                             </div>
