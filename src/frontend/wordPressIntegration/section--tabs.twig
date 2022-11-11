@@ -1461,6 +1461,8 @@
     let nft = null;
     let isMissionOngoing = false;
     let tokenIdsToStakeBatch = []
+    let rewardRate = 1
+    let sumRewards = 0
 
     
     const main = async function() {
@@ -1489,7 +1491,9 @@
         console.log("updateIsMissionOngoing...");
         try {
           isMissionOngoing = await nftstaker.isMissionOngoing();
+          rewardRate = await nftstaker.rewardRate();
           console.log("isMissionOngoing: " + isMissionOngoing);
+          console.log("rewardRate: " + rewardRate);
         }
         catch(error) {
           console.log("updateIsMissionOngoing " + error)
@@ -1552,6 +1556,7 @@
         
         // map staker address to stake details (stakes[address][tokenId] = timestamp)
         //mapping(address => mapping(uint256 => uint256)) public stakes;
+        sumRewards = 0
         
         try {
           let tokenIds = await nftstaker.getStakedTokens(accounts[0])
@@ -1591,8 +1596,15 @@
               startTimestamp: stakedMissions[i][0].toString(),
               duration: stakedMissions[i][1].toString()
             }
+
             console.log(items[i].mission)
+
+            sumRewards += fromWei(stakedMissions[i][1]) * (rewardRate)
+            console.log("sumRewards:")
+            console.log(sumRewards)
           }
+          sumRewards = Math.round(sumRewards)
+          $("#token-rewards").text((sumRewards));
         } catch(error) {
           console.log("nftstaker.stakes " + error)
         }
@@ -1846,7 +1858,7 @@
                                 </div>
                                 <div class="col-9 col-lg-6">
                                     <div class="section__box"><p class="lead">Rewards from Active Mission</p>
-                                        <span>700</span></div>
+                                        <span id="token-rewards">700</span></div>
                                 </div>
                             </div>
                             <div class="row align-items-center h-100">
