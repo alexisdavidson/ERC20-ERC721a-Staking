@@ -10,22 +10,15 @@ async function main() {
   // const teamWallet = "0x61603b8A09C2Aa8f663B43c22C9ceBeC00FC6FeC"; // mainnet
   
   // Fill with correct data and uncomment the correct network before deploy!
-  // const whitelistAddresses = [teamWallet, "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"] // localhost
-  const whitelistAddresses = [teamWallet, 
-    "0x1354075Cd28774e7D952F3Bb786F17959d8C6B61",
-    "0x9447D31a3D6E040e9Ff2b7C848B76431C3EB732E",
-    "0x63041d7A90b5C10B80270Ce5D661af0031A5628d",
-    "0x91bE05C1Ff3D57Ec4683543dbA3cD9507d2e4120",
-    "0xA8095a8AB93D7cad255248D1D685D4a9F9eF2621",
-    "0x77a0279508477A7f8BE6290E964EE8C2Aa65e55C"
-  ] // goerli
+  const whitelistRoot = "0x33076d29ecdd10329eeaf97e972d9c3980817ac6eee176675365f1aef1b10d3c" // goerli
+  // const whitelistRoot = "" // mainnet
 
   // const whitelistAddresses = [teamWallet] // mainnet
   
   const NFT = await ethers.getContractFactory("NFT");
   const Token = await ethers.getContractFactory("Token");
   const NFTStaker = await ethers.getContractFactory("NFTStaker");
-  const nft = await NFT.deploy(teamWallet, whitelistAddresses);
+  const nft = await NFT.deploy(teamWallet, whitelistRoot);
   console.log("NFT contract address", nft.address)
   const nftStaker = await NFTStaker.deploy(nft.address);
   console.log("NFTStaker contract address", nftStaker.address)

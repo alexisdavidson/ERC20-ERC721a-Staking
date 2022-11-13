@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "erc721a/contracts/ERC721A.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 // import {DefaultOperatorFilterer} from "../DefaultOperatorFilterer.sol";
 
 contract NFT is ERC721A, Ownable {
@@ -14,9 +15,7 @@ contract NFT is ERC721A, Ownable {
 
     uint public amountMintPerAccount = 10;
 
-    bool public whitelistEnabled = true;
-    address[] private whitelistedAddresses;
-
+    bytes32 public whitelistRoot;
     bool public publicSaleEnabled;
 
     string private constant unkownNotRevealedUri = "Not revealed yet";
@@ -28,11 +27,9 @@ contract NFT is ERC721A, Ownable {
         address user
     );
 
-    constructor(address teamAddress, address[] memory _usersToWhitelist) ERC721A("Gelatoverse Genesis", "GG")
+    constructor(address teamAddress, bytes32 _whitelistRoot) ERC721A("Gelatoverse Genesis", "GG")
     {
-        // Set whitelist
-        delete whitelistedAddresses;
-        whitelistedAddresses = _usersToWhitelist;
+        whitelistRoot = _whitelistRoot;
 
         // Mint 333 NFTs for the team
         _mint(teamAddress, 333);
@@ -61,9 +58,9 @@ contract NFT is ERC721A, Ownable {
             : '';
     }
 
-    function mint(uint256 quantity) external payable {
+    function mint(uint256 quantity, bytes32[] memory _proof) external payable {
         require(totalSupply() + quantity < max_supply, 'Cannot mint more than max supply');
-        require(publicSaleEnabled || isWhitelisted(address(msg.sender)), 'You are not whitelisted');
+        require(publicSaleEnabled || isValid(_proof, keccak256(abi.encodePacked(msg.sender))), 'You are not whitelisted');
         require(balanceOf(msg.sender) < amountMintPerAccount, 'Each address may only mint x NFTs!');
         require(msg.value >= getPrice(), "Not enough ETH sent; check price!");
         _mint(msg.sender, quantity);
@@ -87,24 +84,12 @@ contract NFT is ERC721A, Ownable {
         publicSaleEnabled = _state;
     }
 
-    function setWhitelistEnabled(bool _state) public onlyOwner {
-        whitelistEnabled = _state;
+    function setWhitelistRoot(bytes32 _whitelistRoot) public onlyOwner {
+        whitelistRoot = _whitelistRoot;
     }
 
-    function whitelistUsers(address[] calldata _users) public onlyOwner {
-        delete whitelistedAddresses;
-        whitelistedAddresses = _users;
-    }
-
-    function isWhitelisted(address _user) public view returns (bool) {
-        uint256 whitelistedAddressesLength = whitelistedAddresses.length;
-        for (uint256 i = 0; i < whitelistedAddressesLength;) {
-            if (whitelistedAddresses[i] == _user) {
-                return true;
-            }
-            unchecked { ++i; }
-        }
-        return false;
+    function isValid(bytes32[] memory _proof, bytes32 _leaf) public view returns (bool) {
+        return MerkleProof.verify(_proof, whitelistRoot, _leaf);
     }
 
     function revealUnkown(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
