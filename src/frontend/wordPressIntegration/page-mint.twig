@@ -14,9 +14,9 @@
           "type": "address"
         },
         {
-          "internalType": "address[]",
-          "name": "_usersToWhitelist",
-          "type": "address[]"
+          "internalType": "bytes32",
+          "name": "_whitelistRoot",
+          "type": "bytes32"
         }
       ],
       "stateMutability": "nonpayable",
@@ -55,6 +55,17 @@
     {
       "inputs": [],
       "name": "MintZeroQuantity",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        }
+      ],
+      "name": "OperatorNotAllowed",
       "type": "error"
     },
     {
@@ -384,12 +395,17 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_user",
-          "type": "address"
+          "internalType": "bytes32[]",
+          "name": "_proof",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_leaf",
+          "type": "bytes32"
         }
       ],
-      "name": "isWhitelisted",
+      "name": "isValid",
       "outputs": [
         {
           "internalType": "bool",
@@ -419,6 +435,11 @@
           "internalType": "uint256",
           "name": "quantity",
           "type": "uint256"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "_proof",
+          "type": "bytes32[]"
         }
       ],
       "name": "mint",
@@ -564,7 +585,7 @@
         },
         {
           "internalType": "bytes",
-          "name": "_data",
+          "name": "data",
           "type": "bytes"
         }
       ],
@@ -633,12 +654,12 @@
     {
       "inputs": [
         {
-          "internalType": "bool",
-          "name": "_state",
-          "type": "bool"
+          "internalType": "bytes32",
+          "name": "_whitelistRoot",
+          "type": "bytes32"
         }
       ],
-      "name": "setWhitelistEnabled",
+      "name": "setWhitelistRoot",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -758,28 +779,15 @@
     },
     {
       "inputs": [],
-      "name": "whitelistEnabled",
+      "name": "whitelistRoot",
       "outputs": [
         {
-          "internalType": "bool",
+          "internalType": "bytes32",
           "name": "",
-          "type": "bool"
+          "type": "bytes32"
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "_users",
-          "type": "address[]"
-        }
-      ],
-      "name": "whitelistUsers",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -790,7 +798,7 @@
       "type": "function"
     }
   ];
-        const nftaddress = '0x9de032cCaFe0Cc2E6EA84b8219a405b882616346'; // todo: replace with correct address and abi
+        const nftaddress = '0x4166b8834b9b6BFd24131058Ff9E2334EdfA5568'; // todo: replace with correct address and abi
 		const mintFunction = async function() {
 			console.log('mintFunction called')
 

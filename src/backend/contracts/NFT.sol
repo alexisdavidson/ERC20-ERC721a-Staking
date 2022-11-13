@@ -115,6 +115,22 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
         amountMintPerAccount = _amountMintPerAccount;
     }
 
+    function transferFrom(address from, address to, uint256 tokenId) public override onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
+        public
+        override
+        onlyAllowedOperator(from)
+    {
+        super.safeTransferFrom(from, to, tokenId, data);
+    }
+
     function withdraw() public onlyOwner {
         payable(msg.sender).transfer(address(this).balance);
     }
