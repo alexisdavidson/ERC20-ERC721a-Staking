@@ -1540,7 +1540,7 @@
         try {
           isMissionOngoing = await nftstaker.isMissionOngoing();
           rewardRate = await nftstaker.rewardRate();
-          tokensToClaim = await nftstaker.getRewardToClaim(account[0]);
+          tokensToClaim = await nftstaker.getRewardToClaim(accounts[0]);
           console.log("isMissionOngoing: " + isMissionOngoing);
           console.log("rewardRate: " + rewardRate);
           console.log("tokensToClaim: " + tokensToClaim);
@@ -1931,7 +1931,7 @@
                                 </div>
 
                                 <div class="col-9 col-lg-6">
-                                    <div class="section__box"><p class="lead">Unclaimed Beach Coin</p><span id="token-unclaimed">1200</span>
+                                    <div class="section__box"><p class="lead">Unclaimed Beach Coin</p><span id="token-unclaimed">0</span>
                                     </div>
                                 </div>
                             </div>
