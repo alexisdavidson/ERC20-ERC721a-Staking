@@ -78,17 +78,26 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         }
     }
 
-    function unstake(uint256 _tokenId) public nonReentrant {
-        Staker memory _staker = stakers[msg.sender];
+    function findIndexForTokenStaker(uint256 _tokenId, address _stakerAddress) private view returns(uint256, bool) {
+        Staker memory _staker = stakers[_stakerAddress];
+
         uint256 _tokenIndex = 0;
-        // Find token Index
+        bool _foundIndex = false;
+        
         uint256 _tokensLength = _staker.tokenIds.length;
         for(uint256 i = 0; i < _tokensLength; i ++) {
             if (_staker.tokenIds[i] == _tokenId) {
                 _tokenIndex = i;
+                _foundIndex = true;
                 break;
             }
         }
+
+        return (_tokenIndex, _foundIndex);
+    }
+
+    function getRewardForTokenIndexStaker(uint256 _tokenIndex, address _stakerAddress) private view returns(uint256) {
+        Staker memory _staker = stakers[_stakerAddress];
 
         // If the player unstakes later than the end of the mission, don't count the time after that
         uint256 _missionEndTimestamp = _staker.missions[_tokenIndex].startTimestamp + _staker.missions[_tokenIndex].duration;
@@ -97,18 +106,52 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 _stakingTime = _leaveMissionTimestamp - _staker.timestamps[_tokenIndex];
         uint256 _reward = _stakingTime * rewardRate;
 
+        return _reward;
+    }
+
+    function unstake(uint256 _tokenId) public nonReentrant {
+        Staker memory _staker = stakers[msg.sender];
+        (uint256 _tokenIndex, bool _foundIndex) = findIndexForTokenStaker(_tokenId, msg.sender);
+        require(_foundIndex, "Index not found for this staker.");
+
+        uint256 _reward = getRewardForTokenIndexStaker(_tokenIndex, msg.sender);
+
         // Unstake NFT from this smart contract
         parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
-        removeStakerElement(_tokenIndex, _tokensLength - 1);
+        removeStakerElement(_tokenIndex, _staker.tokenIds.length - 1);
 
         stakers[msg.sender].tokensToClaim += _reward;
 
         emit UnstakeSuccessful(_tokenId, _reward);
     }
 
+    function sendAllInactiveToMission(uint256[] memory _tokenIds) public nonReentrant {
+        require(isMissionOngoing(), "There is no ongoing mission!");
+        
+        uint256 _tokensIdsLength = _tokenIds.length;
+        uint256 _currentTimestamp = block.timestamp;
+        for (uint256 i = 0; i < _tokensIdsLength;) {
+            
+            (uint256 _tokenIndex, bool _foundIndex) = findIndexForTokenStaker(_tokenIds[i], msg.sender);
+            require(_foundIndex, "Index not found for this staker.");
+            require(stakers[msg.sender].timestamps[_tokenIndex] + stakers[msg.sender].missions[_tokenIndex].duration > _currentTimestamp, 
+                "This Gelato is still on an ongoing mission!");
+            
+            uint256 _reward = getRewardForTokenIndexStaker(_tokenIndex, msg.sender);
+            
+            // Send to next mission
+            stakers[msg.sender].timestamps[_tokenIndex] = _currentTimestamp;
+            stakers[msg.sender].missions[_tokenIndex] = currentMission;
+            
+            // Add reward from last mission
+            stakers[msg.sender].tokensToClaim += _reward;
+            unchecked { ++i; }
+        }
+    }
+
     function claimReward() external {
         uint256 _reward = stakers[msg.sender].tokensToClaim;
-        require(_reward > 0, "No tokens to claim");
+        require(_reward > 0, "No tokens to claim.");
 
         if (rewardsToken.transfer(msg.sender, _reward) == true) {
             stakers[msg.sender].tokensToClaim = 0;
