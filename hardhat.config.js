@@ -5,7 +5,7 @@ require("dotenv").config();
 const { REACT_APP_API_URL, REACT_APP_PRIVATE_KEY } = process.env;
 
 module.exports = {
-  solidity: "0.8.4",
+  solidity: "0.8.13",
   networks: {
      hardhat: {},
      goerli: {

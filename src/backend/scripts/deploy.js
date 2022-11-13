@@ -10,7 +10,7 @@ async function main() {
   // const teamWallet = "0x61603b8A09C2Aa8f663B43c22C9ceBeC00FC6FeC"; // mainnet
   
   // Fill with correct data and uncomment the correct network before deploy!
-  const whitelistRoot = "0x33076d29ecdd10329eeaf97e972d9c3980817ac6eee176675365f1aef1b10d3c" // goerli
+  const whitelistRoot = "0xed939e2a170a445cc0494ffda5aa1df52a6c50a393e6bdd0be9bc5f3dd99eaf3" // goerli
   // const whitelistRoot = "" // mainnet
 
   // const whitelistAddresses = [teamWallet] // mainnet
