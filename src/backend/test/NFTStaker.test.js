@@ -202,3 +202,12 @@ describe("NFTStaker", async function() {
         })
     })
 })
+
+
+/*
+- [ ]  sendAllInactiveToMission
+- [ ]  getRewardForTokenIndexStaker
+- [ ]  findIndexForTokenStaker
+- [ ]  claimReward
+- [ ]  getRewardToClaim
+*/

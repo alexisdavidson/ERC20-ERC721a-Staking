@@ -20,6 +20,7 @@ const buf2hex = x => '0x' + x.toString('hex')
 const rootHash = merkleTree.getRoot();
 console.log('Whitelist Merkle Tree\n', merkleTree.toString());
 console.log("Root Hash Hex: ", buf2hex(merkleTree.getRoot()));
+return
 
 // ***** ***** ***** ***** ***** ***** ***** ***** // 
 
