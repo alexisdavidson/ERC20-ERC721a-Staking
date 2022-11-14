@@ -134,7 +134,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
             
             (uint256 _tokenIndex, bool _foundIndex) = findIndexForTokenStaker(_tokenIds[i], msg.sender);
             require(_foundIndex, "Index not found for this staker.");
-            require(stakers[msg.sender].timestamps[_tokenIndex] + stakers[msg.sender].missions[_tokenIndex].duration > _currentTimestamp, 
+            require(stakers[msg.sender].timestamps[_tokenIndex] + stakers[msg.sender].missions[_tokenIndex].duration < _currentTimestamp, 
                 "This Gelato is still on an ongoing mission!");
             
             uint256 _reward = getRewardForTokenIndexStaker(_tokenIndex, msg.sender);
