@@ -1715,6 +1715,19 @@
         }
 
         document.getElementById("items-container-hq").innerHTML = cardsHtml
+
+        // Start mission button for batch
+        const button = isMissionOngoing ? 
+          `<button class="mint btn btn-secondary" onClick="stakeBatch()">
+              Start Mission
+            </button>
+            `
+        : 
+          `<button class="mint btn btn-secondary" style="background-color: gray;">
+              Start Mission
+            </button>` 
+          
+        document.getElementById("start-mission-batch").innerHTML = button
       }
 
       const createMissionCards = async (stakedItems, currentTimestamp) => {
@@ -1870,10 +1883,7 @@
                             </div>
                             <div class="row align-items-center h-100">
                                 <div class="col-12">
-                                    <p class="section__cta">
-                                      <button class="mint btn btn-secondary" onClick="stakeBatch()">
-                                            Start Mission
-                                      </button>
+                                    <p class="section__cta" id="start-mission-batch">
                                     </p>
                                 </div>
                             </div>
