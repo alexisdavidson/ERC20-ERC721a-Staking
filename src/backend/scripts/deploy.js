@@ -6,7 +6,7 @@ async function main() {
 
   // Fill with correct data and uncomment the correct network before deploy!
   // const teamWallet = "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"; // localhost
-  const teamWallet = "0xD71E736a7eF7a9564528D41c5c656c46c18a2AEd"; // goerli
+  const teamWallet = "0xCdb34512BD8123110D20852ebEF947275f7fD1Ce"; // goerli
   // const teamWallet = "0x61603b8A09C2Aa8f663B43c22C9ceBeC00FC6FeC"; // mainnet
   
   // Fill with correct data and uncomment the correct network before deploy!
