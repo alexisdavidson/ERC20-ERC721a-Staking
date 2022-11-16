@@ -1525,6 +1525,10 @@
     let sumRewards = 0
     let tokensToClaim = 0
 
+    const refresh = async function () {
+      console.log("refresh")
+    }
+
     
     const main = async function() {
       accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -1816,8 +1820,17 @@
         <div class="section__inner">
             <div class="row align-items-center h-100">
                 <div class="col-12">
-                    <div class="section__close">
+                    <div class="section__close row">
+                      <div class="col-6">
+                        <div style="text-align: left; margin-left: 2rem; margin-top: 2rem; ">
+                          <button class="btn btn-secondary" style="margin: 0;" onClick="refresh()">
+                            Refresh
+                          </button>
+                        </div>
+                      </div>
+                      <div class="col-6">
                         <button id="" class="point-close"><i class="fas fa-times"></i></button>
+                      </div>
                     </div>
                     <h3 class="section__title">Missions</h3>
                     <p class="lead"></p>
