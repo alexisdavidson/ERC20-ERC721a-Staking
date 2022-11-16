@@ -1530,8 +1530,8 @@
 
       const loadingHtml = 'Loading...'
       document.getElementById("items-container-opensea").innerHTML = loadingHtml
-        document.getElementById("items-container-mission").innerHTML = loadingHtml
-        document.getElementById("items-container-hq").innerHTML = loadingHtml
+      document.getElementById("items-container-mission").innerHTML = loadingHtml
+      document.getElementById("items-container-hq").innerHTML = loadingHtml
       $("#token-balance").text(loadingHtml);
       $("#token-unclaimed").text(loadingHtml);
       $("#token-rewards").text(loadingHtml);
@@ -1737,7 +1737,7 @@
         tokenIdsToStakeBatch = []
         if (stakedItems != null && stakedItems.length > 0) {
           for(i = 0; i < stakedItems.length; i ++) {
-            const isMissionOver = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.startTimestamp
+            const isMissionOver = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.duration
             if (isMissionOver) {
               tokenIdsToStakeBatch.push(stakedItems[i].token_id)
               cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
@@ -1768,7 +1768,7 @@
         
         if (stakedItems != null && stakedItems.length > 0) {
           for(i = 0; i < stakedItems.length; i ++) {
-            const isMissionOver = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.startTimestamp
+            const isMissionOver = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.duration
             if (!isMissionOver)
               cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
           }
