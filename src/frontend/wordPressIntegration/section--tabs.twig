@@ -1521,16 +1521,29 @@
     let nft = null;
     let isMissionOngoing = false;
     let tokenIdsToStakeBatch = []
-    let rewardRate = 1
+    let hoursForUnitReward = 4
     let sumRewards = 0
     let tokensToClaim = 0
 
     const refresh = async function () {
       console.log("refresh")
+
+      const loadingHtml = 'Loading...'
+      document.getElementById("items-container-opensea").innerHTML = loadingHtml
+        document.getElementById("items-container-mission").innerHTML = loadingHtml
+        document.getElementById("items-container-hq").innerHTML = loadingHtml
+      $("#token-balance").text(loadingHtml);
+      $("#token-unclaimed").text(loadingHtml);
+      $("#token-rewards").text(loadingHtml);
+
+      await updateBalance();
+      await updateIsMissionOngoing();
+      await createOpenseaCards();
+      await createStakedCards();
     }
 
     
-    const main = async function() {
+    const initializeContracts = async function() {
       accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       provider = new ethers.providers.Web3Provider(window.ethereum)
       signer = provider.getSigner()
@@ -1538,13 +1551,16 @@
       nftstaker = new ethers.Contract(nftstakeraddress, nftstakerabi, signer)
       nft = new ethers.Contract(nftaddress, nftabi, signer)
 
+      await refresh();
+    }
+
       const updateBalance = async function() {
         console.log("updateBalance...");
         console.log("account: " + accounts[0]);
         try {
           const balance = await token.balanceOf(accounts[0]);
           console.log("balance: " + balance);
-          $("#token-balance").text(fromWei(balance));
+          $("#token-balance").text(Math.floor(balance));
         }
         catch(error) {
           console.log("updateBalance " + error)
@@ -1556,12 +1572,12 @@
         console.log("updateIsMissionOngoing...");
         try {
           isMissionOngoing = await nftstaker.isMissionOngoing();
-          rewardRate = await nftstaker.rewardRate();
+          hoursForUnitReward = await nftstaker.hoursForUnitReward();
           tokensToClaim = await nftstaker.getRewardToClaim(accounts[0]);
           console.log("isMissionOngoing: " + isMissionOngoing);
-          console.log("rewardRate: " + rewardRate);
+          console.log("hoursForUnitReward: " + hoursForUnitReward);
           console.log("tokensToClaim: " + tokensToClaim);
-          $("#token-unclaimed").text(fromWei(tokensToClaim));
+          $("#token-unclaimed").text(Math.floor(tokensToClaim));
         }
         catch(error) {
           console.log("updateIsMissionOngoing " + error)
@@ -1667,7 +1683,7 @@
 
             console.log(items[i].mission)
 
-            sumRewards += fromWei(stakedMissions[i][1]) * (rewardRate)
+            sumRewards += Math.floor(Math.floor(stakedMissions[i][1] / 3600) / hoursForUnitReward)
             console.log("sumRewards:")
             console.log(sumRewards)
           }
@@ -1763,12 +1779,7 @@
         document.getElementById("items-container-mission").innerHTML = cardsHtml
       }
 
-      await updateBalance();
-      await updateIsMissionOngoing();
-      await createOpenseaCards();
-      await createStakedCards();
-    }
-    main()
+    initializeContracts();
     
     const claimReward = async () => {
       console.log(claimReward)
