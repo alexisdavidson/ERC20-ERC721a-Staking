@@ -13,7 +13,7 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
 
     uint256 public immutable max_supply = 9941;
 
-    uint public amountMintPerAccount = 10;
+    uint public amountMintPerAccount = 1;
 
     bytes32 public whitelistRoot;
     bool public publicSaleEnabled;
