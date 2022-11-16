@@ -856,7 +856,7 @@
       }
       catch (error) {
         console.error("Custom error handling: " + error);
-        document.getElementById("error-message").innerHTML = "<br/>" + error
+        document.getElementById("error-message").innerHTML = "<br/>" + (error.toString()).split('reverted:')[1].split('"')[0];
       };
 		};
 		
