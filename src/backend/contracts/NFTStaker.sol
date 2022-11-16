@@ -118,11 +118,18 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
 
         uint256 _reward = getRewardForTokenIndexStaker(_tokenIndex, msg.sender);
 
+        bool _missionIsOver = isSpecificMissionOver(_staker.missions[_tokenIndex].startTimestamp, 
+                                                    _staker.missions[_tokenIndex].duration, 
+                                                    block.timestamp);
+
         // Unstake NFT from this smart contract
         parentNFT.safeTransferFrom(address(this), msg.sender, _tokenId);
         removeStakerElement(_tokenIndex, _staker.tokenIds.length - 1);
 
-        stakers[msg.sender].tokensToClaim += _reward;
+        // Only reward if the mission is over
+        if (_missionIsOver) {
+            stakers[msg.sender].tokensToClaim += _reward;
+        }
 
         emit UnstakeSuccessful(_tokenId, _reward);
     }
@@ -136,7 +143,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
             
             (uint256 _tokenIndex, bool _foundIndex) = findIndexForTokenStaker(_tokenIds[i], msg.sender);
             require(_foundIndex, "Index not found for this staker.");
-            require(stakers[msg.sender].timestamps[_tokenIndex] + stakers[msg.sender].missions[_tokenIndex].duration < _currentTimestamp, 
+            require(isSpecificMissionOver(stakers[msg.sender].missions[_tokenIndex].startTimestamp, stakers[msg.sender].missions[_tokenIndex].duration, _currentTimestamp), 
                 "This Gelato is still on an ongoing mission!");
             
             uint256 _reward = getRewardForTokenIndexStaker(_tokenIndex, msg.sender);
@@ -149,6 +156,10 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
             stakers[msg.sender].tokensToClaim += _reward;
             unchecked { ++i; }
         }
+    }
+
+    function isSpecificMissionOver(uint256 _timestamp, uint256 _duration, uint256 _currentTimestamp) internal pure returns(bool) {
+        return _timestamp + _duration < _currentTimestamp;
     }
 
     function claimReward() external {

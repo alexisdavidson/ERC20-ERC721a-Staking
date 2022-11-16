@@ -62,6 +62,44 @@ describe("NFTStaker", async function() {
 
             await expect(nftStaker.connect(addr1).stake(333)).to.be.revertedWith('There is no ongoing mission!');
 
+            await nftStaker.startMission(24 * 10 + 1); // 10 Days mission
+            await nftStaker.connect(addr1).stake(333);
+            
+            expect((await nftStaker.getStakedTokens(addr1.address))[0]).to.equals(333);
+
+            expect((await nft.ownerOf(333))).to.equals(nftStaker.address);
+            expect((await token.balanceOf(addr1.address))).to.equals(0);
+            expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount);
+
+            // Unstake after 11 days
+            const elevenDays = 11 * 24 * 60 * 60 + 10;
+            await helpers.time.increase(elevenDays);
+
+            await nftStaker.connect(addr1).unstake(333);
+            expect((await nft.ownerOf(333))).to.equals(addr1.address);
+
+            const expectedReward = 10 * (24 / hoursForUnitReward);
+            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward);
+            await nftStaker.connect(addr1).claimReward();
+
+            // Expecting 50 units as reward
+            console.log("Expected Reward: " + expectedReward)
+            console.log("Staker actual new balance: " + fromWei(await token.balanceOf(addr1.address)))
+
+            expect((await token.balanceOf(addr1.address))).to.equals(expectedReward);
+            expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount - expectedReward);
+        })
+
+        it("Should not reward when mission was not over", async function() {
+            const proof1 = getWhitelistProof(addr1.address)
+            await nft.connect(addr1).mint(1, proof1);
+            expect((await nft.ownerOf(333))).to.equals(addr1.address);
+            
+            // Stake
+            await nft.connect(addr1).setApprovalForAll(nftStaker.address, true);
+
+            await expect(nftStaker.connect(addr1).stake(333)).to.be.revertedWith('There is no ongoing mission!');
+
             await nftStaker.startMission(24 * 15); // 15 Days mission
             await nftStaker.connect(addr1).stake(333);
             
@@ -78,10 +116,9 @@ describe("NFTStaker", async function() {
             await nftStaker.connect(addr1).unstake(333);
             expect((await nft.ownerOf(333))).to.equals(addr1.address);
 
-            const expectedReward = 10 * (24 / hoursForUnitReward);
+            const expectedReward = 0;
             expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward);
-            await nftStaker.connect(addr1).claimReward();
-            expect(await nftStaker.getRewardToClaim(addr1.address)).to.equals(0);
+            await expect(nftStaker.connect(addr1).claimReward()).to.be.revertedWith('No tokens to claim.');
 
             // Expecting 50 units as reward
             console.log("Expected Reward: " + expectedReward)
@@ -197,7 +234,7 @@ describe("NFTStaker", async function() {
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount);
 
             const tenDays = 10 * 24 * 60 * 60 + 10;
-            await helpers.time.increase(tenDays);
+            await helpers.time.increase(tenDays + 3600);
 
             await nftStaker.startMission(missionTime); 
 
@@ -215,9 +252,11 @@ describe("NFTStaker", async function() {
 
             expect((await token.balanceOf(addr1.address))).to.equals(0);
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount);
+            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward);
 
             // Now restake
             await nftStaker.connect(addr1).stake(333);
+            console.log("Mission: " + await nftStaker.getStakedMissions(addr1.address))
 
             await helpers.time.increase(tenDays);
             
