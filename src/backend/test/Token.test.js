@@ -33,4 +33,10 @@ describe("Token", async function() {
             expect(await token.symbol()).to.equal("BC")
         })
     })
+
+    describe("Decimals", function() {
+        it("Should have 0 decimals", async function() {
+            expect(await token.decimals()).to.equal(0)
+        })
+    })
 })

@@ -15,4 +15,8 @@ contract Token is ERC20 {
             unchecked { ++i; }
         }
     }
+
+    function decimals() public view virtual override returns (uint8) {
+        return 0;
+    }
 }

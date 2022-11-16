@@ -25,7 +25,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 duration; // In hours
     }
 
-    uint256 public rewardRate; // Reward to be paid out per second
+    uint256 public hoursForUnitReward; // Hours needed to be rewarded one unit of token
     Mission currentMission;
     mapping(address => Staker) private stakers;
     
@@ -41,7 +41,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
 
     constructor(address nftAddress) {
         parentNFT = ERC721A(nftAddress);
-        rewardRate = 5 * 10**uint(18) / 1 days; // 5 per day
+        hoursForUnitReward = 4; // 1 unit rewarded every 4 hours
     }
 
     function setOwnerAndTokenAddress(address _newOwner, address _tokenAddress) external onlyOwner {
@@ -104,7 +104,9 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         uint256 _leaveMissionTimestamp = block.timestamp > _missionEndTimestamp ? _missionEndTimestamp : block.timestamp;
         // Handout reward depending on the stakingTime
         uint256 _stakingTime = _leaveMissionTimestamp - _staker.timestamps[_tokenIndex];
-        uint256 _reward = _stakingTime * rewardRate;
+
+        uint256 _hoursPassed = _stakingTime / 3600;
+        uint256 _reward = _hoursPassed / hoursForUnitReward;
 
         return _reward;
     }
