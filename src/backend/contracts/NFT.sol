@@ -22,6 +22,8 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
 
     uint256 public price;
+
+    mapping(address => uint256) amountsMinted;
     
     event MintSuccessful(
         address user
@@ -61,8 +63,10 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     function mint(uint256 quantity, bytes32[] memory _proof) external payable {
         require(totalSupply() + quantity < max_supply, 'Cannot mint more than max supply');
         require(publicSaleEnabled || isValid(_proof, keccak256(abi.encodePacked(msg.sender))), 'You are not whitelisted');
-        require(balanceOf(msg.sender) < amountMintPerAccount, 'Each address may only mint x NFTs!');
+        require(amountsMinted[msg.sender] + quantity <= amountMintPerAccount, 'Each address may only mint x NFTs!');
         require(msg.value >= getPrice(), "Not enough ETH sent; check price!");
+
+        amountsMinted[msg.sender] += quantity;
         _mint(msg.sender, quantity);
         
         emit MintSuccessful(msg.sender);

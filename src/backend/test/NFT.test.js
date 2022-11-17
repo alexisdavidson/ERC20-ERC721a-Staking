@@ -12,6 +12,7 @@ describe("NFT", async function() {
     let teamWallet = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     let whitelist = []
     let whitelistRoot = "0x343750465941b29921f50a28e0e43050e5e1c2611a3ea8d7fe1001090d5e1436"
+    let amountMintPerAccount = 1
 
     const getWhitelistProof = (acc) => {
         const accHashed = keccak256(acc)
@@ -45,6 +46,26 @@ describe("NFT", async function() {
         })
     })
 
+    describe("Amount mint per account", function() {
+        it("Should allow only 1 minting per account", async function() {
+            let proof1 = getWhitelistProof(addr1.address)
+            let proof2 = getWhitelistProof(addr2.address)
+            let proof3 = getWhitelistProof(addr3.address)
+
+            expect(await nft.amountMintPerAccount()).to.equals(1);
+
+            // addr1 mints an nft
+            await nft.connect(addr1).mint(1, proof1);
+            expect(await nft.totalSupply()).to.equal(334);
+            expect(await nft.balanceOf(addr1.address)).to.equal(1);
+
+            // addr1 cant mint another nft
+            await expect(nft.connect(addr1).mint(1, proof1)).to.be.revertedWith('Each address may only mint x NFTs!');
+            expect(await nft.totalSupply()).to.equal(334);
+            expect(await nft.balanceOf(addr1.address)).to.equal(1);
+        })
+    })
+
     describe("Whitelist Merkletree", function() {
         it("Should allow Whitelistes addresses", async function() {
             const proof1 = getWhitelistProof(addr1.address)
@@ -71,13 +92,15 @@ describe("NFT", async function() {
             await nft.connect(addr1).mint(1, proof1);
             expect(await nft.totalSupply()).to.equal(334);
             expect(await nft.balanceOf(addr1.address)).to.equal(1);
-            // addr2 mints 2 nfts
-            await nft.connect(addr2).mint(2, proof2);
-            expect(await nft.totalSupply()).to.equal(336);
-            expect(await nft.balanceOf(addr2.address)).to.equal(2);
+
+            // addr2 cant mint 2 nfts
+            await expect(nft.connect(addr2).mint(2, proof2)).to.be.revertedWith('Each address may only mint x NFTs!');
+            expect(await nft.totalSupply()).to.equal(334);
+            expect(await nft.balanceOf(addr2.address)).to.equal(0);
+
             // should refuse minting on non-whitelisted addresses
-            await expect(nft.connect(addr3).mint(2, proof3)).to.be.revertedWith('You are not whitelisted');
-            expect(await nft.totalSupply()).to.equal(336);
+            await expect(nft.connect(addr3).mint(1, proof3)).to.be.revertedWith('You are not whitelisted');
+            expect(await nft.totalSupply()).to.equal(334);
             expect(await nft.balanceOf(addr3.address)).to.equal(0);
         })
 
@@ -90,15 +113,15 @@ describe("NFT", async function() {
     describe("URIs", function() {
         it("Should have correct URIs", async function() {
             let proof2 = getWhitelistProof(addr2.address)
-            await nft.connect(addr2).mint(3, proof2);
-            expect(await nft.totalSupply()).to.equal(336);
+            await nft.connect(addr2).mint(1, proof2);
+            expect(await nft.totalSupply()).to.equal(334);
             
             //Unknown URIs. When not revealed, it stays the base URI
             expect(await nft.tokenURI(0)).to.equal(URI + "0.json");
             expect(await nft.tokenURI(19)).to.equal(URI + "19.json");
             //Normal URIs
             expect(await nft.tokenURI(20)).to.equal(URI + "20.json");
-            expect(await nft.tokenURI(334)).to.equal(URI + "334.json");
+            expect(await nft.tokenURI(333)).to.equal(URI + "333.json");
         })
 
         it("Should update Unkown URI", async function() {

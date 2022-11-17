@@ -278,27 +278,22 @@ describe("NFTStaker", async function() {
         })
 
         it("Stake 2 Gelatos, finish a mission, then call sendAllInactiveMission", async function() {
-            const proof1 = getWhitelistProof(addr1.address)
-            await nft.connect(addr1).mint(2, proof1);
-            expect((await nft.ownerOf(333))).to.equals(addr1.address);
-            expect((await nft.ownerOf(334))).to.equals(addr1.address);
-            
             // Stake
-            await nft.connect(addr1).setApprovalForAll(nftStaker.address, true);
+            await nft.connect(deployer).setApprovalForAll(nftStaker.address, true);
 
-            await expect(nftStaker.connect(addr1).stake(333)).to.be.revertedWith('There is no ongoing mission!');
+            await expect(nftStaker.connect(deployer).stake(331)).to.be.revertedWith('There is no ongoing mission!');
 
             const missionTime = 24 * 5 + 1; // 5 Days mission
             await nftStaker.startMission(missionTime); 
-            await nftStaker.connect(addr1).stake(333);
-            await nftStaker.connect(addr1).stake(334);
+            await nftStaker.connect(deployer).stake(331);
+            await nftStaker.connect(deployer).stake(332);
             
-            expect((await nftStaker.getStakedTokens(addr1.address))[0]).to.equals(333);
-            expect((await nftStaker.getStakedTokens(addr1.address))[1]).to.equals(334);
+            expect((await nftStaker.getStakedTokens(deployer.address))[0]).to.equals(331);
+            expect((await nftStaker.getStakedTokens(deployer.address))[1]).to.equals(332);
 
-            expect((await nft.ownerOf(333))).to.equals(nftStaker.address);
-            expect((await nft.ownerOf(334))).to.equals(nftStaker.address);
-            expect((await token.balanceOf(addr1.address))).to.equals(0);
+            expect((await nft.ownerOf(331))).to.equals(nftStaker.address);
+            expect((await nft.ownerOf(332))).to.equals(nftStaker.address);
+            expect((await token.balanceOf(deployer.address))).to.equals(teamTokenAmount);
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount);
 
             const fiveDays = 5 * 24 * 60 * 60 + 10;
@@ -307,35 +302,35 @@ describe("NFTStaker", async function() {
 
             await nftStaker.startMission(missionTime);
 
-            await nftStaker.connect(addr1).sendAllInactiveToMission([333, 334]);
+            await nftStaker.connect(deployer).sendAllInactiveToMission([331, 332]);
 
             const expectedReward1 = 2 * 5 * (24 / hoursForUnitReward);
-            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward1);
-            await nftStaker.connect(addr1).claimReward();
-            expect(await nftStaker.getRewardToClaim(addr1.address)).to.equals(0);
-            expect((await token.balanceOf(addr1.address))).to.equals(expectedReward1);
+            expect((await nftStaker.getRewardToClaim(deployer.address))).to.equals(expectedReward1);
+            await nftStaker.connect(deployer).claimReward();
+            expect(await nftStaker.getRewardToClaim(deployer.address)).to.equals(0);
+            expect((await token.balanceOf(deployer.address))).to.equals(teamTokenAmount + expectedReward1);
 
             // Expecting 2 * 50 units as reward
             console.log("Expected Reward: " + expectedReward1)
-            console.log("Staker actual new balance: " + (await token.balanceOf(addr1.address)))
+            console.log("Staker actual new balance: " + (await token.balanceOf(deployer.address)))
 
             await helpers.time.increase(tenDays);
             
-            await nftStaker.connect(addr1).unstake(333);
-            expect((await nft.ownerOf(333))).to.equals(addr1.address);
-            await nftStaker.connect(addr1).unstake(334);
-            expect((await nft.ownerOf(334))).to.equals(addr1.address);
+            await nftStaker.connect(deployer).unstake(331);
+            expect((await nft.ownerOf(331))).to.equals(deployer.address);
+            await nftStaker.connect(deployer).unstake(332);
+            expect((await nft.ownerOf(332))).to.equals(deployer.address);
 
             const expectedReward2 = 2 * 5 * (24 / hoursForUnitReward);
-            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward2);
-            await nftStaker.connect(addr1).claimReward();
-            expect(await nftStaker.getRewardToClaim(addr1.address)).to.equals(0);
+            expect((await nftStaker.getRewardToClaim(deployer.address))).to.equals(expectedReward2);
+            await nftStaker.connect(deployer).claimReward();
+            expect(await nftStaker.getRewardToClaim(deployer.address)).to.equals(0);
 
             // Expecting 2 * 25 units as reward
             console.log("Expected Reward: " + expectedReward2)
-            console.log("Staker actual new balance: " + (await token.balanceOf(addr1.address)))
+            console.log("Staker actual new balance: " + (await token.balanceOf(deployer.address)))
 
-            expect((await token.balanceOf(addr1.address))).to.equals(expectedReward1 + expectedReward2);
+            expect((await token.balanceOf(deployer.address))).to.equals(teamTokenAmount + expectedReward1 + expectedReward2);
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount - (expectedReward2 + expectedReward2));
         })
     })
