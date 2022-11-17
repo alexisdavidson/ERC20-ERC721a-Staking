@@ -1285,6 +1285,19 @@
     },
     {
       "inputs": [],
+      "name": "hoursForUnitReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "isMissionOngoing",
       "outputs": [
         {
@@ -1384,19 +1397,6 @@
     },
     {
       "inputs": [],
-      "name": "rewardRate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "rewardsToken",
       "outputs": [
         {
@@ -1455,19 +1455,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256[]",
-          "name": "_tokenIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "stakeBatch",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "uint256",
           "name": "_duration",
           "type": "uint256"
@@ -1506,9 +1493,9 @@
     }
   ]
 
-    const nftaddress = '0x23777cB907B11D25c0764139aDCDd860Cd3De4c5'; // todo: replace with correct address and abi
-    const nftstakeraddress = '0x395256157f6f808FEe723C84A1ec078efDfEA393'; // todo: replace with correct address and abi
-    const tokenaddress = '0x293A64e025DEF7CB49e0c1f864004bA092593542'; // todo: replace with correct address and abi
+    const nftaddress = '0x11903630D5F62898b25A27AeE82A5a088D564dDd'; // todo: replace with correct address and abi
+    const nftstakeraddress = '0xb9843f650aFDF7daf621814602c5D0b0E67a8A7B'; // todo: replace with correct address and abi
+    const tokenaddress = '0xC5d9c6Ecd456957dCB1621142D50A34E04dfc00a'; // todo: replace with correct address and abi
     const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
     // const urlApi = 'https://api.opensea.io/api/v1' // mainnet
 
@@ -1748,7 +1735,7 @@
         }
 
         if (!atLeastOneMissionOver) {
-          cardsHtml += "<p>You currently don't have a Gelato NFT in a mission.</p>"
+          cardsHtml += "<p>You currently don't have any Gelato NFTs in HQ</p>"
         }
 
         document.getElementById("items-container-hq").innerHTML = cardsHtml

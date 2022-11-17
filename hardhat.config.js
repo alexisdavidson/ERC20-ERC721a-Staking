@@ -15,6 +15,13 @@ module.exports = {
        gas: 2100000,
        gasPrice: 8000000000,
      },
+     sepolia: {
+       url: process.env.REACT_APP_API_URL_SEPOLIA_INFURA,
+       accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_SEPOLIA],
+       allowUnlimitedContractSize: true,
+       gas: 2100000,
+       gasPrice: 8000000000,
+     },
   },
   paths: {
     artifacts: "./src/backend/artifacts",
