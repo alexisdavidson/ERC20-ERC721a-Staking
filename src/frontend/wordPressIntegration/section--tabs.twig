@@ -1573,7 +1573,7 @@
 
       const createCardHtml = async (token_id, name, image, isStaked) => {
         const stakeUnstakeText = isStaked ? "Send home" : "Start Mission"
-        const button = isMissionOngoing ? 
+        const button = (isMissionOngoing || isStaked) ? 
           `<button class="mint btn btn-secondary" style="margin: 0;"
               onClick="stakeUnstakeFunction(${token_id}, ${isStaked})">
                 ${stakeUnstakeText}
