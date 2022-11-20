@@ -1625,30 +1625,28 @@
       const loadStakedItems = async () => {
         let items = []
         
-        // map staker address to stake details (stakes[address][tokenId] = timestamp)
-        //mapping(address => mapping(uint256 => uint256)) public stakes;
         sumRewards = 0
         
-        try {
-          let tokenIds = await nftstaker.getStakedTokens(accounts[0])
-          let stakedMissions = await nftstaker.getStakedMissions(accounts[0])
-          let tokenIdsDecimal = []
-          for(i = 0; i < tokenIds.length; i ++) {
-             tokenIdsDecimal.push(tokenIds[i].toString())
-            console.log("FromWei: " + tokenIdsDecimal[i])
-          }
-          console.log("tokenIdsDecimal from Staker: ")
-          console.log(tokenIdsDecimal)
+        let tokenIds = await nftstaker.getStakedTokens(accounts[0])
+        let stakedMissions = await nftstaker.getStakedMissions(accounts[0])
+        let tokenIdsDecimal = []
+        for(i = 0; i < tokenIds.length; i ++) {
+            tokenIdsDecimal.push(tokenIds[i].toString())
+          console.log("FromWei: " + tokenIdsDecimal[i])
+        }
+        console.log("tokenIdsDecimal from Staker: ")
+        console.log(tokenIdsDecimal)
 
-          if(tokenIdsDecimal.length > 0) {
-            let finalUrl = `${urlApi}/assets?asset_contract_address=${nftaddress}`
+        if(tokenIdsDecimal.length > 0) {
+          let finalUrl = `${urlApi}/assets?asset_contract_address=${nftaddress}`
+        
+          for(i = 0; i < tokenIdsDecimal.length; i ++) {
+            finalUrl += "&token_ids=" + tokenIdsDecimal[i]
+          }
+          finalUrl += `&format=json`
+          console.log("Sending api call for items to " + finalUrl)
           
-            for(i = 0; i < tokenIdsDecimal.length; i ++) {
-              finalUrl += "&token_ids=" + tokenIdsDecimal[i]
-            }
-            finalUrl += `&format=json`
-            console.log("Sending api call for items to " + finalUrl)
-            
+          try {
             items = await fetch(finalUrl)
             .then((res) => res.json())
             .then((res) => {
@@ -1659,14 +1657,23 @@
               console.error('Could not talk to OpenSea')
               return null
             })
+          } catch(error) {
+            console.log("nftstaker.staked opensea error: " + error)
           }
-
+        }
           console.log("Missions: ")
-          for(i = 0; i < items.length && i < stakedMissions.length; i++) {
-            items[i].mission = {
+          for(i = 0; i < stakedMissions.length; i++) {
+            const missionObject = {
               startTimestamp: parseInt(stakedMissions[i][0].toString()),
               duration: parseInt(stakedMissions[i][1].toString())
             }
+            if (i >= items.length) {
+              items.push(missionObject)
+              items[items.length - 1].token_id = tokenIdsDecimal[i]
+              items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
+            }
+            else
+              items[i].mission = missionObject
 
             console.log(items[i].mission)
 
@@ -1676,9 +1683,6 @@
           }
           sumRewards = Math.round(sumRewards)
           $("#token-rewards").text((sumRewards));
-        } catch(error) {
-          console.log("nftstaker.stakes " + error)
-        }
 
         console.log("Staked items loaded: ");
         console.log(items);
@@ -1692,7 +1696,7 @@
         
         if (openSeaItems != null && openSeaItems.length > 0) {
           for(i = 0; i < openSeaItems.length; i ++)
-            cardsHtml += await createCardHtml(openSeaItems[i].token_id, openSeaItems[i].name, openSeaItems[i].image_url, false)
+            cardsHtml += await createCardHtml(openSeaItems[i]?.token_id, openSeaItems[i]?.name, openSeaItems[i]?.image_url, false)
         } else {
           cardsHtml += "<p>You don’t have any Gelato to send on a mission! Buy more coward!</p>"
         }
@@ -1729,7 +1733,7 @@
             if (isMissionOver) {
               atLeastOneMissionOver = true
               tokenIdsToStakeBatch.push(stakedItems[i].token_id)
-              cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
+              cardsHtml += await createCardHtml(stakedItems[i]?.token_id, stakedItems[i]?.name, stakedItems[i]?.image_url, true)
             }
           }
         }
@@ -1763,7 +1767,7 @@
             const isMissionOver = currentTimestamp > stakedItems[i].mission.startTimestamp + stakedItems[i].mission.duration
             if (!isMissionOver) {
               atLeastOneMissionOnGoing = true
-              cardsHtml += await createCardHtml(stakedItems[i].token_id, stakedItems[i].name, stakedItems[i].image_url, true)
+              cardsHtml += await createCardHtml(stakedItems[i]?.token_id, stakedItems[i]?.name, stakedItems[i]?.image_url, true)
             }
           }
         }
