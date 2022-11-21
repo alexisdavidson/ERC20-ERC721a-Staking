@@ -16,6 +16,7 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     uint public amountMintPerAccount = 1;
 
     bytes32 public whitelistRoot;
+    bool public mintEnabled;
     bool public publicSaleEnabled;
 
     string private constant unkownNotRevealedUri = "Not revealed yet";
@@ -59,6 +60,7 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     }
 
     function mint(uint256 quantity, bytes32[] memory _proof) external payable {
+        require(mintEnabled, "Mint disabled");
         require(totalSupply() + quantity < max_supply, 'Cannot mint more than max supply');
         require(publicSaleEnabled || isValid(_proof, keccak256(abi.encodePacked(msg.sender))), 'You are not whitelisted');
         require(_numberMinted(msg.sender) + quantity <= amountMintPerAccount, 'Each address may only mint x NFTs!');
@@ -83,6 +85,11 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
 
     function setPublicSaleEnabled(bool _state) public onlyOwner {
         publicSaleEnabled = _state;
+    }
+    }
+
+    function setMintEnabled(bool _state) public onlyOwner {
+        mintEnabled = _state;
     }
 
     function setWhitelistRoot(bytes32 _whitelistRoot) public onlyOwner {
