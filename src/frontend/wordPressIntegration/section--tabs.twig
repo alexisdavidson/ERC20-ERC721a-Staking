@@ -1512,6 +1512,11 @@
     let sumRewards = 0
     let tokensToClaim = 0
 
+    
+  function timeout(delay) {
+    return new Promise( res => setTimeout(res, delay) );
+  }
+
     const refresh = async function () {
       console.log("refresh")
 
@@ -1605,7 +1610,7 @@
         const finalUrl = `${urlApi}/assets?owner=${accounts[0]}&asset_contract_address=${nftaddress}&format=json`
         console.log("Sending api call for items to " + finalUrl)
 
-        const items = await fetch(finalUrl)
+        let items = await fetch(finalUrl)
         .then((res) => res.json())
         .then((res) => {
           return res.assets
@@ -1615,6 +1620,9 @@
           console.error('Could not talk to OpenSea')
           return null
         })
+
+        if (items == null || items == undefined)
+          items = []
 
         console.log("OpenSea items loaded: ");
         console.log(items);
@@ -1645,6 +1653,7 @@
           }
           finalUrl += `&format=json`
           console.log("Sending api call for items to " + finalUrl)
+          await timeout(1000);
           
           try {
             items = await fetch(finalUrl)
@@ -1660,29 +1669,36 @@
           } catch(error) {
             console.log("nftstaker.staked opensea error: " + error)
           }
+
         }
-          console.log("Missions: ")
-          for(i = 0; i < stakedMissions.length; i++) {
-            const missionObject = {
-              startTimestamp: parseInt(stakedMissions[i][0].toString()),
-              duration: parseInt(stakedMissions[i][1].toString())
-            }
-            if (i >= items.length) {
-              items.push(missionObject)
-              items[items.length - 1].token_id = tokenIdsDecimal[i]
-              items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
-            }
-            else
-              items[i].mission = missionObject
-
-            console.log(items[i].mission)
-
-            sumRewards += Math.floor(Math.floor(stakedMissions[i][1] / 3600) / hoursForUnitReward)
-            console.log("sumRewards:")
-            console.log(sumRewards)
+        
+        if (items == undefined || items == null)
+          items = []
+        if (stakedMissions == undefined || stakedMissions == null)
+          stakedMissions = []
+        
+        console.log("Missions: ")
+        for(i = 0; i < stakedMissions.length; i++) {
+          const missionObject = {
+            startTimestamp: parseInt(stakedMissions[i][0].toString()),
+            duration: parseInt(stakedMissions[i][1].toString())
           }
-          sumRewards = Math.round(sumRewards)
-          $("#token-rewards").text((sumRewards));
+          if (i >= items.length) {
+            items.push(missionObject)
+            items[items.length - 1].token_id = tokenIdsDecimal[i]
+            items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
+          }
+          else
+            items[i].mission = missionObject
+
+          console.log(items[i].mission)
+
+          sumRewards += Math.floor(Math.floor(stakedMissions[i][1] / 3600) / hoursForUnitReward)
+          console.log("sumRewards:")
+          console.log(sumRewards)
+        }
+        sumRewards = Math.round(sumRewards)
+        $("#token-rewards").text((sumRewards));
 
         console.log("Staked items loaded: ");
         console.log(items);
