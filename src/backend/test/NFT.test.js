@@ -32,6 +32,7 @@ describe("NFT", async function() {
 
         // Deploy contracts
         nft = await NFT.deploy(teamWallet, whitelistRoot);
+        await nft.setMintEnabled(true);
     });
 
     describe("Deployment", function() {
@@ -128,7 +129,6 @@ describe("NFT", async function() {
             await nft.revealUnkown(0, "UnkownUri0");
             expect(await nft.tokenURI(0)).to.equal("UnkownUri0");
             
-            await expect(nft.revealUnkown(0, "UnkownUri0")).to.be.revertedWith('unkown has already been revealed');
             await expect(nft.revealUnkown(20, "UnkownUri20")).to.be.revertedWith('tokenId must be between 0 and 20');
         })
     })

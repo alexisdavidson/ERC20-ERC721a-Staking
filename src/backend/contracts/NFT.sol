@@ -86,7 +86,6 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     function setPublicSaleEnabled(bool _state) public onlyOwner {
         publicSaleEnabled = _state;
     }
-    }
 
     function setMintEnabled(bool _state) public onlyOwner {
         mintEnabled = _state;
