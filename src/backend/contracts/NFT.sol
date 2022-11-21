@@ -95,7 +95,6 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
 
     function revealUnkown(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
         require(_tokenId < 20, "tokenId must be between 0 and 20");
-        require(!isUnkownRevealed(_tokenId), "unkown has already been revealed");
 
         unknownUris[_tokenId] = tokenUri;
     }
