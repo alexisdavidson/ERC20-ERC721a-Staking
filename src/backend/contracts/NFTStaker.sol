@@ -161,24 +161,19 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     }
 
     function claimReward() external {
-        // Find out if some gelatos' missions are over and tokens were not received for them yet
-        uint256[] memory _stakedTokens = getStakedTokens(msg.sender);
-        uint256 _stakedTokensLength = _stakedTokens.length;
-
-        uint256 _currentTimestamp = block.timestamp;
-        for (uint256 i = 0; i < _stakedTokensLength;) {
-            if (isSpecificMissionOver(stakers[msg.sender].missions[i].startTimestamp, stakers[msg.sender].missions[i].duration, _currentTimestamp)) {
-                stakers[msg.sender].tokensToClaim += getRewardForTokenIndexStaker(i, msg.sender);
-                stakers[msg.sender].tokensReceived[i] = true;
-            }
-            unchecked { ++i; }
-        }
-
-        // Claim the reward
-        uint256 _reward = stakers[msg.sender].tokensToClaim;
+        uint256 _reward = getRewardToClaim(msg.sender);
         require(_reward > 0, "No tokens to claim.");
 
         if (rewardsToken.transfer(msg.sender, _reward) == true) {
+            uint256 _stakedTokensLength = getStakedTokens(msg.sender).length;
+            uint256 _currentTimestamp = block.timestamp;
+            for (uint256 i = 0; i < _stakedTokensLength;) {
+                bool _isMissionOver = isSpecificMissionOver(stakers[msg.sender].missions[i].startTimestamp, stakers[msg.sender].missions[i].duration, _currentTimestamp);
+                if (_isMissionOver) { // Don't mark as claimed if the next mission has already been started
+                    stakers[msg.sender].tokensReceived[i] = true;
+                }
+                unchecked { ++i; }
+            }
             stakers[msg.sender].tokensToClaim = 0;
         }
         else revert();
@@ -221,6 +216,19 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     }
     
     function getRewardToClaim(address _user) public view returns (uint256) {
-        return stakers[_user].tokensToClaim;
+        uint256 _tokensToClaim = stakers[_user].tokensToClaim;
+
+        // Find out if some gelatos' missions are over and tokens were not received for them yet
+        uint256 _stakedTokensLength = getStakedTokens(_user).length;
+
+        uint256 _currentTimestamp = block.timestamp;
+        for (uint256 i = 0; i < _stakedTokensLength;) {
+            if (!stakers[_user].tokensReceived[i] && isSpecificMissionOver(stakers[_user].missions[i].startTimestamp, stakers[_user].missions[i].duration, _currentTimestamp)) {
+                _tokensToClaim += getRewardForTokenIndexStaker(i, _user);
+            }
+            unchecked { ++i; }
+        }
+
+        return _tokensToClaim;
     }
 }

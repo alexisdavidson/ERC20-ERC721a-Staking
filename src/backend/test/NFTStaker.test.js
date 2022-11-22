@@ -79,6 +79,7 @@ describe("NFTStaker", async function() {
             // await nftStaker.connect(addr1).unstake(333);
 
             const expectedReward = 10 * (24 / hoursForUnitReward);
+            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(expectedReward);
             await nftStaker.connect(addr1).claimReward();
             expect((await nft.ownerOf(333))).to.equals(nftStaker.address);
 
@@ -88,6 +89,9 @@ describe("NFTStaker", async function() {
 
             expect((await token.balanceOf(addr1.address))).to.equals(expectedReward);
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount - expectedReward);
+            
+            expect((await nftStaker.getRewardToClaim(addr1.address))).to.equals(0);
+            await expect(nftStaker.connect(addr1).claimReward()).to.be.revertedWith('No tokens to claim.');
             
             await nftStaker.connect(addr1).unstake(333);
 
@@ -359,8 +363,8 @@ describe("NFTStaker", async function() {
             expect((await token.balanceOf(deployer.address))).to.equals(teamTokenAmount + expectedReward1);
 
             // Expecting 2 * 50 units as reward
-            console.log("Expected Reward: " + expectedReward1)
-            console.log("Staker actual new balance: " + (await token.balanceOf(deployer.address)))
+            console.log("1.Expected Reward: " + expectedReward1)
+            console.log("1.Staker actual new balance: " + (await token.balanceOf(deployer.address)))
 
             await helpers.time.increase(tenDays);
             
@@ -375,8 +379,8 @@ describe("NFTStaker", async function() {
             expect(await nftStaker.getRewardToClaim(deployer.address)).to.equals(0);
 
             // Expecting 2 * 25 units as reward
-            console.log("Expected Reward: " + expectedReward2)
-            console.log("Staker actual new balance: " + (await token.balanceOf(deployer.address)))
+            console.log("2.Expected Reward: " + expectedReward2)
+            console.log("2.Staker actual new balance: " + (await token.balanceOf(deployer.address)))
 
             expect((await token.balanceOf(deployer.address))).to.equals(teamTokenAmount + expectedReward1 + expectedReward2);
             expect((await token.balanceOf(nftStaker.address))).to.equals(stakerTokenAmount - (expectedReward2 + expectedReward2));
