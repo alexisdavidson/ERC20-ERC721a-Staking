@@ -214,6 +214,20 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     function getStakedMissions(address _user) public view returns (Mission[] memory missions) {
         return stakers[_user].missions;
     }
+
+    function getRewardFromActiveMission(address _user) public view returns (uint256) {
+        uint256 _rewardFromActiveMission = 0;
+        uint256 _stakedTokensLength = getStakedTokens(_user).length;
+
+        for (uint256 i = 0; i < _stakedTokensLength;) {
+            if (!stakers[_user].tokensReceived[i]) {
+                _rewardFromActiveMission += getRewardForTokenIndexStaker(i, _user);
+            }
+            unchecked { ++i; }
+        }
+
+        return _rewardFromActiveMission;
+    }
     
     function getRewardToClaim(address _user) public view returns (uint256) {
         uint256 _tokensToClaim = stakers[_user].tokensToClaim;
