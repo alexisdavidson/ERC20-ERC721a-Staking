@@ -215,13 +215,15 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         return stakers[_user].missions;
     }
 
-    function getRewardFromActiveMission(address _user) public view returns (uint256) {
+    // Frontend purposes only
+    function getRewardFromActiveMission(address _user) external view returns (uint256) {
+        Staker memory _staker = stakers[_user];
         uint256 _rewardFromActiveMission = 0;
         uint256 _stakedTokensLength = getStakedTokens(_user).length;
 
         for (uint256 i = 0; i < _stakedTokensLength;) {
-            if (!stakers[_user].tokensReceived[i]) {
-                _rewardFromActiveMission += getRewardForTokenIndexStaker(i, _user);
+            if (!_staker.tokensReceived[i]) {
+                _rewardFromActiveMission += (_staker.missions[i].duration / 3600) / hoursForUnitReward;
             }
             unchecked { ++i; }
         }
@@ -244,5 +246,9 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
         }
 
         return _tokensToClaim;
+    }
+
+    function setHoursForUnitReward(uint256 _hoursForUnitReward) public onlyOwner {
+        hoursForUnitReward = _hoursForUnitReward;
     }
 }

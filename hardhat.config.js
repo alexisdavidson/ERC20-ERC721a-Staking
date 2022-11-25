@@ -12,7 +12,7 @@ module.exports = {
        url: process.env.REACT_APP_API_URL_GOERLI_INFURA,
        accounts: ['0x' + process.env.REACT_APP_PRIVATE_KEY_GOERLI],
        allowUnlimitedContractSize: true,
-       gas: 6000000,//60
+       gas: 2000000,//20
        gasPrice: 8000000000,//800
      },
      sepolia: {
