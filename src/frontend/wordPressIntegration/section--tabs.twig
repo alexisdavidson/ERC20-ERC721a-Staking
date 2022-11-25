@@ -234,7 +234,7 @@
         if (openSeaItems != null && openSeaItems.length > 0) {
           for(i = 0; i < openSeaItems.length; i ++) {
             const isStacked = await nft.ownerOf(openSeaItems[i]?.token_id)
-            console.log("isStacked: " + isStacked)
+            // console.log("isStacked: " + isStacked)
             if (isStacked.toLowerCase() == accounts[0].toLowerCase())
               cardsHtml += await createCardHtml(openSeaItems[i]?.token_id, openSeaItems[i]?.name, openSeaItems[i]?.image_url, false)
           }
