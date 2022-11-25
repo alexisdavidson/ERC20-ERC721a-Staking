@@ -158,7 +158,7 @@
         let tokenIdsDecimal = []
         for(i = 0; i < tokenIds.length; i ++) {
             tokenIdsDecimal.push(tokenIds[i].toString())
-          console.log("FromWei: " + tokenIdsDecimal[i])
+            // console.log("FromWei: " + tokenIdsDecimal[i])
         }
         console.log("tokenIdsDecimal from Staker: ")
         console.log(tokenIdsDecimal)
@@ -209,7 +209,7 @@
           else
             items[i].mission = missionObject
 
-          console.log(items[i].mission)
+          // console.log(items[i].mission)
 
           // sumRewards += Math.floor(Math.floor(stakedMissions[i][1] / 3600) / hoursForUnitReward)
           // console.log("sumRewards:")
@@ -229,13 +229,19 @@
         let openSeaItems = await loadOpenSeaItems();
         let cardsHtml = ""
         
+        console.log("createOpenseaCards")
+        console.log(accounts[0])
         if (openSeaItems != null && openSeaItems.length > 0) {
-          for(i = 0; i < openSeaItems.length; i ++)
-            cardsHtml += await createCardHtml(openSeaItems[i]?.token_id, openSeaItems[i]?.name, openSeaItems[i]?.image_url, false)
-        } else {
+          for(i = 0; i < openSeaItems.length; i ++) {
+            const isStacked = await nft.ownerOf(openSeaItems[i]?.token_id)
+            console.log("isStacked: " + isStacked)
+            if (isStacked.toLowerCase() == accounts[0].toLowerCase())
+              cardsHtml += await createCardHtml(openSeaItems[i]?.token_id, openSeaItems[i]?.name, openSeaItems[i]?.image_url, false)
+          }
+        } 
+        else
           cardsHtml += "<p>You don’t have any Gelato to send on a mission! Buy more coward!</p>"
-        }
-
+        
         document.getElementById("items-container-opensea").innerHTML = cardsHtml
       }
 
