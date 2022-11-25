@@ -249,6 +249,7 @@ contract NFTStaker is ERC721Holder, ReentrancyGuard, Ownable {
     }
 
     function setHoursForUnitReward(uint256 _hoursForUnitReward) public onlyOwner {
+        require(_hoursForUnitReward > 0, "Can't set to 0");
         hoursForUnitReward = _hoursForUnitReward;
     }
 }
