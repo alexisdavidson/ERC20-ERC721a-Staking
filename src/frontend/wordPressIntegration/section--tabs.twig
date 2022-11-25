@@ -237,7 +237,7 @@
             duration: parseInt(stakedMissions[i][1].toString())
           }
           if (i >= items.length) {
-            items.push(missionObject)
+            items.push({mission: missionObject})
             items[items.length - 1].token_id = tokenIdsDecimal[i]
             items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
           }
