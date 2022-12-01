@@ -19,8 +19,7 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     bool public mintEnabled;
     bool public publicSaleEnabled;
 
-    string private constant unkownNotRevealedUri = "Not revealed yet";
-    string[20] private unknownUris; // 20 unkown to be revealed one by one as the story progresses.
+    mapping(uint256 => string) replacedUris;
 
     uint256 public price;
     
@@ -35,13 +34,6 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
         // Mint 333 NFTs for the team
         _mint(teamAddress, 333);
 
-        // Set unkownUris
-        uint256 unknownUrisLength = unknownUris.length;
-        for (uint256 i = 0; i < unknownUrisLength;) {
-            unknownUris[i] = unkownNotRevealedUri;
-            unchecked { ++i; }
-        }
-
         // Transfer ownership
         _transferOwnership(teamAddress);
     }
@@ -49,8 +41,8 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), 'ERC721Metadata: URI query for nonexistent token ');
 
-        if (_tokenId < 20 && isUnkownRevealed(_tokenId)) { // 20 first tokens are Unkowns
-            return unknownUris[_tokenId];
+        if (bytes(replacedUris[_tokenId]).length > 0) {
+            return replacedUris[_tokenId];
         }
 
         string memory currentBaseURI = _baseURI();
@@ -99,14 +91,8 @@ contract NFT is ERC721A, Ownable, DefaultOperatorFilterer {
         return MerkleProof.verify(_proof, whitelistRoot, _leaf);
     }
 
-    function revealUnkown(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
-        require(_tokenId < 20, "tokenId must be between 0 and 20");
-
-        unknownUris[_tokenId] = tokenUri;
-    }
-
-    function isUnkownRevealed(uint256 _tokenId) public view returns(bool) {
-        return keccak256(abi.encodePacked((unknownUris[_tokenId]))) != keccak256(abi.encodePacked((unkownNotRevealedUri)));
+    function replaceUri(uint256 _tokenId, string calldata tokenUri) public onlyOwner {
+        replacedUris[_tokenId] = tokenUri;
     }
 
     function getPrice() view public returns(uint) {

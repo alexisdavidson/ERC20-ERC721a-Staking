@@ -126,10 +126,10 @@ describe("NFT", async function() {
         })
 
         it("Should update Unkown URI", async function() {
-            await nft.revealUnkown(0, "UnkownUri0");
+            await nft.replaceUri(0, "UnkownUri0");
             expect(await nft.tokenURI(0)).to.equal("UnkownUri0");
-            
-            await expect(nft.revealUnkown(20, "UnkownUri20")).to.be.revertedWith('tokenId must be between 0 and 20');
+            await nft.replaceUri(200, "UnkownUri200");
+            expect(await nft.tokenURI(200)).to.equal("UnkownUri200");
         })
     })
 })
