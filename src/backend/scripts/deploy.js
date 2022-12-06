@@ -6,13 +6,13 @@ async function main() {
 
   // Fill with correct data and uncomment the correct network before deploy!
   // const teamWallet = "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"; // localhost
-  let teamWallet = "0xCdb34512BD8123110D20852ebEF947275f7fD1Ce"; // goerli
+  // let teamWallet = "0xCdb34512BD8123110D20852ebEF947275f7fD1Ce"; // goerli
   // teamWallet = "0xD71E736a7eF7a9564528D41c5c656c46c18a2AEd" // my team wallet for testing purposes
-  // const teamWallet = "0x61603b8A09C2Aa8f663B43c22C9ceBeC00FC6FeC"; // mainnet
+  let teamWallet = "0x22412FA59a350dDec268bE6d6b9e12cCef414753"; // mainnet
   
   // Fill with correct data and uncomment the correct network before deploy!
-  const whitelistRoot = "0xed939e2a170a445cc0494ffda5aa1df52a6c50a393e6bdd0be9bc5f3dd99eaf3" // goerli
-  // const whitelistRoot = "" // mainnet
+  // const whitelistRoot = "0xe41dd57c0c99fa6016139f0ed8513ae95d9028fe9a9b84fe78e075075ff155bb" // goerli
+  const whitelistRoot = "0xe41dd57c0c99fa6016139f0ed8513ae95d9028fe9a9b84fe78e075075ff155bb" // mainnet
 
   // const whitelistAddresses = [teamWallet] // mainnet
   
