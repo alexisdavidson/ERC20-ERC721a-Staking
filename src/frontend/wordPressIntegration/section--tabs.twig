@@ -41,17 +41,16 @@
     const clickNext = async function () { refresh(next) }
     const clickPrevious = async function () { refresh(previous) }
     const generateNextPreviousHtml = () => {
-      const startPageLinkHtml = `<a  onmouseover="this.style.cursor='pointer';" 
-      onmouseout="this.style.cursor='auto';" 
-      style="text-decoration: underline;" `
+      const startPageLinkHtml = `<button class='btn btn-secondary' style='margin: 0; margin-bottom: 30px; margin-right: 20px;' `
       let finalHtml = '<div>'
+
       if (previous) {
-        finalHtml += startPageLinkHtml + "onclick='clickPrevious()'>Previous</a>"
+        finalHtml += startPageLinkHtml + "onclick='clickPrevious()'>Previous</button>"
       }
       if (next) {
         if (previous)
-          finalHtml += " / "
-        finalHtml += startPageLinkHtml + "onclick='clickNext()'>Next</a>"
+          finalHtml += " "
+        finalHtml += startPageLinkHtml + "onclick='clickNext()'>Next</button>"
       }
       finalHtml += '</div>'
 
@@ -71,7 +70,7 @@
       document.getElementById("next-previous-container").innerHTML = ''
       $("#token-balance").text(loadingHtml);
       $("#token-unclaimed").text(loadingHtml);
-      $("#token-rewards").text(loadingHtml);
+      // $("#token-rewards").text(loadingHtml);
 
       await updateBalance();
       await updateIsMissionOngoing();
@@ -252,7 +251,7 @@
         }
         // sumRewards = Math.round(sumRewards)
         sumRewards = await nftstaker.getRewardFromActiveMission(accounts[0])
-        $("#token-rewards").text((sumRewards));
+        // $("#token-rewards").text((sumRewards));
 
         console.log("Staked items loaded: ");
         console.log(items);
@@ -533,7 +532,7 @@
                         </div>
                         <div class="tab-pane fade" id="nav-rewards" role="tabpanel" aria-labelledby="nav-rewards-tab">
 
-                            <div class="row align-items-center h-100">
+                            {# <div class="row align-items-center h-100">
                                 <div class="col-3 col-lg-1 offset-0 offset-lg-2">
                                     <div class="featured-image">
                                         <img class="img-fluid d-block"
@@ -545,7 +544,7 @@
                                     <div class="section__box"><p class="lead">Rewards from Active Mission</p>
                                         <span id="token-rewards">700</span></div>
                                 </div>
-                            </div>
+                            </div> #}
                             <div class="row align-items-center h-100">
                                 <div class="col-3 col-lg-1 offset-0 offset-lg-2">
                                     <div class="featured-image">
