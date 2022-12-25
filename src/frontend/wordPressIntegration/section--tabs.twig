@@ -11,11 +11,15 @@
     const tokenabi = [{"inputs":[{"internalType":"address[]","name":"_minterAddresses","type":"address[]"},{"internalType":"uint256[]","name":"_tokenAmount","type":"uint256[]"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]
     const nftstakerabi = [{"inputs":[{"internalType":"address","name":"nftAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"StakeSuccessful","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"UnstakeSuccessful","type":"event"},{"inputs":[],"name":"claimReward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getRewardFromActiveMission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getRewardToClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedMissions","outputs":[{"components":[{"internalType":"uint256","name":"startTimestamp","type":"uint256"},{"internalType":"uint256","name":"duration","type":"uint256"}],"internalType":"struct NFTStaker.Mission[]","name":"missions","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTimestamps","outputs":[{"internalType":"uint256[]","name":"timestamps","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getStakedTokens","outputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hoursForUnitReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"isMissionOngoing","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isTokenStaked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"}],"name":"onERC721Received","outputs":[{"internalType":"bytes4","name":"","type":"bytes4"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"parentNFT","outputs":[{"internalType":"contract ERC721A","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardsToken","outputs":[{"internalType":"contract ERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"_tokenIds","type":"uint256[]"}],"name":"sendAllInactiveToMission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_newOwner","type":"address"},{"internalType":"address","name":"_tokenAddress","type":"address"}],"name":"setOwnerAndTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_duration","type":"uint256"}],"name":"startMission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"unstake","outputs":[],"stateMutability":"nonpayable","type":"function"}]
 
-    const nftaddress = '0x719061eD7E189768a19bf9300E5e40300Fc871ad'; // todo: replace with correct address and abi
-    const nftstakeraddress = '0xd9e4B6Ed2c927ec2647558388530f3b85aBA57DA'; // todo: replace with correct address and abi
-    const tokenaddress = '0xe0273463e75163a179b060fFf67B701eA793ea15'; // todo: replace with correct address and abi
-    // const urlApi = 'https://testnets-api.opensea.io/api/v1' // testnet
-    const urlApi = 'https://api.opensea.io/api/v1' // mainnet
+    // const nftaddress = '0xF158bec5cf689b8BaaBa239B7d28f5A62D6200bc'; // Goerli
+    // const nftstakeraddress = '0xfB4D6ab5E228154B8a0357a2306cA9cc8faa31F4'; // Goerli
+    // const tokenaddress = '0xad635a9Aa0e1aDE3472ECF297a53FA4399bA927B'; // Goerli
+    // const urlApi = 'https://testnets-api.opensea.io/api/v1' // Testnet Goerli
+    
+    const nftaddress = '0x719061eD7E189768a19bf9300E5e40300Fc871ad'; // Mainnet
+    const nftstakeraddress = '0xd9e4B6Ed2c927ec2647558388530f3b85aBA57DA'; // Mainnet
+    const tokenaddress = '0xe0273463e75163a179b060fFf67B701eA793ea15'; // Mainnet
+    const urlApi = 'https://api.opensea.io/api/v1' // Mainnet
 
     const fromWei = (num) => ethers.utils.formatEther(num)
     let accounts = [];
@@ -184,6 +188,7 @@
 
       const loadStakedItems = async () => {
         let items = []
+        let itemsOpenSea = []
         
         sumRewards = 0
         
@@ -208,7 +213,7 @@
           await timeout(1000);
           
           try {
-            items = await fetch(finalUrl)
+            itemsOpenSea = await fetch(finalUrl)
             .then((res) => res.json())
             .then((res) => {
               return res.assets
@@ -224,8 +229,8 @@
 
         }
         
-        if (items == undefined || items == null)
-          items = []
+        if (itemsOpenSea == undefined || itemsOpenSea == null)
+          itemsOpenSea = []
         if (stakedMissions == undefined || stakedMissions == null)
           stakedMissions = []
         
@@ -235,13 +240,15 @@
             startTimestamp: parseInt(stakedMissions[i][0].toString()),
             duration: parseInt(stakedMissions[i][1].toString())
           }
-          if (i >= items.length) {
-            items.push({mission: missionObject})
-            items[items.length - 1].token_id = tokenIdsDecimal[i]
-            items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
+
+          items.push({mission: missionObject})
+          items[items.length - 1].token_id = tokenIdsDecimal[i]
+          items[items.length - 1].name = "Gelato #" + tokenIdsDecimal[i]
+
+          for (let j = 0; j < itemsOpenSea.length; j ++) {
+            if (itemsOpenSea[j].token_id == items[items.length - 1].token_id)
+              items[items.length - 1].image_url = itemsOpenSea[j].image_url
           }
-          else
-            items[i].mission = missionObject
 
           // console.log(items[i].mission)
 
